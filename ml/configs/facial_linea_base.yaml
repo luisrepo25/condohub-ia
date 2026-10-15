@@ -1,0 +1,11 @@
+# Línea base facial (I2): embeddings congelados + SVM/k-NN. Semilla fija; cada corrida guarda su metrics.json.
+nombre: facial_linea_base
+semilla: 42
+dataset:
+  fuente: lfw            # público, para evaluar; los fotos propias con consentimiento se suman aparte (I1)
+  min_fotos_por_persona: 10   # con 20 quedan ~60 personas y la partición de prueba sería de ~12: métricas muy ruidosas
+proporciones: [0.6, 0.2, 0.2]   # train / val / test, por PERSONA
+pares_por_parte: 4000
+far_maximo: 0.01          # el umbral se elige para no superar este FAR en validación
+k_vecinos: 5
+umbral_inicial_i2: 0.70   # valor de partida de la regla I2; el definitivo sale de la calibración

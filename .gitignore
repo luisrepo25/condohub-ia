@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.env
+# I6: datasets, fotos y pesos no se versionan
+ml/data/
+*.pt
+*.onnx

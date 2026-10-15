@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "condohub-ia"
+version = "0.1.0"
+description = "Servicio IA de CondoHub: visión (rostros, placas) y voz (reportes)"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9",
+    "pyjwt[crypto]>=2.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx>=0.27",
+    "pyyaml>=6",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+ml = [
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "pyyaml>=6",
+    "matplotlib>=3.9",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "ml/tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 110
+extend-exclude = ["ml/notebooks"]
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["app"]
