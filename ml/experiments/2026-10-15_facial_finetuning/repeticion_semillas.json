@@ -1,0 +1,47 @@
+{
+  "filas": [
+    {
+      "semilla": 42,
+      "eer_base": 0.0465,
+      "eer_ajustado": 0.039,
+      "mejora": 0.0075
+    },
+    {
+      "semilla": 43,
+      "eer_base": 0.049,
+      "eer_ajustado": 0.045,
+      "mejora": 0.0040000000000000036
+    },
+    {
+      "semilla": 44,
+      "eer_base": 0.04825,
+      "eer_ajustado": 0.0455,
+      "mejora": 0.0027500000000000024
+    },
+    {
+      "semilla": 45,
+      "eer_base": 0.04,
+      "eer_ajustado": 0.046,
+      "mejora": -0.005999999999999998
+    },
+    {
+      "semilla": 46,
+      "eer_base": 0.0585,
+      "eer_ajustado": 0.0545,
+      "mejora": 0.0040000000000000036
+    }
+  ],
+  "resumen": {
+    "repeticiones": 5,
+    "eer_base_media": 0.04845,
+    "eer_ajustado_media": 0.046,
+    "mejora_media": 0.002450000000000002,
+    "repeticiones_donde_mejora": 4,
+    "desviacion": 0.005044799302251776,
+    "ic95": [
+      -0.0038129414686710887,
+      0.008712941468671093
+    ],
+    "concluyente": false
+  }
+}

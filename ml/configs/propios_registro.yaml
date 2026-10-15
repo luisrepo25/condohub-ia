@@ -1,0 +1,6 @@
+# Registro de las personas del equipo por embeddings (sin reentrenar la red). I1, I2.
+nombre: propios_registro
+semilla: 42
+far_maximo: 0.01          # máximo de impostores (LFW) aceptados; calibra el umbral solo con impostores de validación
+min_fotos_lfw: 10         # personas de LFW que actúan como desconocidos
+carpeta_propios: datos/propios   # dentro de ML_DATA_DIR (Drive, privado): propios/<persona>/<sesion>/foto.jpg

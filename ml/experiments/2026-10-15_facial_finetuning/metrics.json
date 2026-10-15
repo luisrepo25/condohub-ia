@@ -1,0 +1,162 @@
+{
+  "config": {
+    "nombre": "facial_finetuning",
+    "semilla": 42,
+    "dataset": {
+      "fuente": "lfw",
+      "min_fotos_por_persona": 10
+    },
+    "proporciones": [
+      0.6,
+      0.2,
+      0.2
+    ],
+    "pares_por_parte": 4000,
+    "far_maximo": 0.01,
+    "k_vecinos": 5,
+    "entrenables": [
+      "block8",
+      "last_linear",
+      "last_bn"
+    ],
+    "personas_por_lote": 16,
+    "fotos_por_persona": 4,
+    "epocas": 8,
+    "pasos_por_epoca": 40,
+    "tasa_aprendizaje": 0.0001,
+    "margen": 0.2,
+    "mejora_minima_eer": 0.0
+  },
+  "historial": [
+    {
+      "epoca": 1,
+      "perdida": 0.021037375001469627,
+      "tripletas_activas": 0.19518229831010103
+    },
+    {
+      "epoca": 2,
+      "perdida": 0.01720322683104314,
+      "tripletas_activas": 0.15664062928408384
+    },
+    {
+      "epoca": 3,
+      "perdida": 0.012504263484152034,
+      "tripletas_activas": 0.1292968774214387
+    },
+    {
+      "epoca": 4,
+      "perdida": 0.01113513412710745,
+      "tripletas_activas": 0.11145833656191825
+    },
+    {
+      "epoca": 5,
+      "perdida": 0.010510684965993278,
+      "tripletas_activas": 0.11627604574896395
+    },
+    {
+      "epoca": 6,
+      "perdida": 0.011356084613362327,
+      "tripletas_activas": 0.11197917005047202
+    },
+    {
+      "epoca": 7,
+      "perdida": 0.007583071521366946,
+      "tripletas_activas": 0.07812500221189111
+    },
+    {
+      "epoca": 8,
+      "perdida": 0.005896660397411324,
+      "tripletas_activas": 0.06536458504851908
+    }
+  ],
+  "verificacion_base": {
+    "umbral_calibrado_en_validacion": 0.4568873643875122,
+    "eer_validacion": 0.048,
+    "umbral_en_eer_validacion": 0.345317542552948,
+    "prueba": {
+      "umbral": 0.4568873643875122,
+      "far": 0.003,
+      "frr": 0.061,
+      "exactitud": 0.968
+    },
+    "eer_prueba": 0.0465
+  },
+  "verificacion_ajustado": {
+    "umbral_calibrado_en_validacion": 0.569960355758667,
+    "eer_validacion": 0.049,
+    "umbral_en_eer_validacion": 0.42685097455978394,
+    "prueba": {
+      "umbral": 0.569960355758667,
+      "far": 0.002,
+      "frr": 0.097,
+      "exactitud": 0.9505
+    },
+    "eer_prueba": 0.044
+  },
+  "decision": {
+    "eer_base": 0.0465,
+    "eer_ajustado": 0.044,
+    "mejora_absoluta": 0.0025000000000000022,
+    "adoptar": true
+  },
+  "propios_base": {
+    "umbral_calibrado_con_impostores_de_validacion": 0.5330408215522766,
+    "far_maximo_pedido": 0.01,
+    "far_prueba": 0.001635322976287817,
+    "impostores": {
+      "validacion": 986,
+      "prueba": 1223
+    },
+    "frr": 0.0888888888888889,
+    "confusiones": 0,
+    "por_sesion": [
+      {
+        "persona": "luis",
+        "sesion": "Luz alta",
+        "fotos": 77,
+        "reconocidas": 71,
+        "rechazadas": 6,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "luis",
+        "sesion": "Luz baja",
+        "fotos": 13,
+        "reconocidas": 11,
+        "rechazadas": 2,
+        "confundidas_con_otra_persona": 0
+      }
+    ],
+    "sesiones_omitidas_por_ser_la_unica": []
+  },
+  "propios_ajustado": {
+    "umbral_calibrado_con_impostores_de_validacion": 0.6026507019996643,
+    "far_maximo_pedido": 0.01,
+    "far_prueba": 0.008176614881439084,
+    "impostores": {
+      "validacion": 986,
+      "prueba": 1223
+    },
+    "frr": 0.05555555555555558,
+    "confusiones": 0,
+    "por_sesion": [
+      {
+        "persona": "luis",
+        "sesion": "Luz alta",
+        "fotos": 77,
+        "reconocidas": 72,
+        "rechazadas": 5,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "luis",
+        "sesion": "Luz baja",
+        "fotos": 13,
+        "reconocidas": 13,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      }
+    ],
+    "sesiones_omitidas_por_ser_la_unica": []
+  }
+}

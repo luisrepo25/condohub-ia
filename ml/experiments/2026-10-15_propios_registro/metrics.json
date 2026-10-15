@@ -1,0 +1,34 @@
+{
+  "umbral_calibrado_con_impostores_de_validacion": 0.5762691497802734,
+  "far_maximo_pedido": 0.01,
+  "far_prueba": 0.0011560693641618498,
+  "impostores": {
+    "validacion": 1729,
+    "prueba": 2595
+  },
+  "frr": 0.0888888888888889,
+  "confusiones": 0,
+  "por_sesion": [
+    {
+      "persona": "luis",
+      "sesion": "Luz alta",
+      "fotos": 77,
+      "reconocidas": 71,
+      "rechazadas": 6,
+      "confundidas_con_otra_persona": 0
+    },
+    {
+      "persona": "luis",
+      "sesion": "Luz baja",
+      "fotos": 13,
+      "reconocidas": 11,
+      "rechazadas": 2,
+      "confundidas_con_otra_persona": 0
+    }
+  ],
+  "sesiones_omitidas_por_ser_la_unica": [],
+  "deteccion_por_sesion": {
+    "luis/Luz alta": "77/80",
+    "luis/Luz baja": "13/18"
+  }
+}

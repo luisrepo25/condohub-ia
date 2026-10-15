@@ -1,0 +1,19 @@
+# Ajuste fino de FaceNet con triplet loss (semi-hard). Semilla fija; cada corrida guarda su metrics.json.
+nombre: facial_finetuning
+semilla: 42
+dataset:
+  fuente: lfw
+  min_fotos_por_persona: 10
+proporciones: [0.6, 0.2, 0.2]   # train / val / test, por PERSONA (la misma partición para el modelo base y el ajustado)
+pares_por_parte: 4000
+far_maximo: 0.01
+k_vecinos: 5
+# --- entrenamiento
+entrenables: [block8, last_linear, last_bn]   # solo las últimas capas; el resto queda congelado
+personas_por_lote: 16
+fotos_por_persona: 4
+epocas: 8
+pasos_por_epoca: 40
+tasa_aprendizaje: 0.0001
+margen: 0.2
+mejora_minima_eer: 0.0    # el modelo ajustado se adopta solo si baja el EER en personas NO vistas
