@@ -28,10 +28,12 @@ const modeloRef = {
 // ---------------------------------------------------------------------
 asegurar('perfiles_faciales', {
   bsonType: 'object',
-  required: ['residenteSub', 'unidadCodigo', 'consentimiento', 'embeddings', 'creadoEn'],
+  required: ['residenteId', 'residenteSub', 'unidadId', 'consentimiento', 'embeddings', 'creadoEn'],
   properties: {
-    residenteSub: { bsonType: 'string', description: 'sub de Keycloak del residente' },
-    unidadCodigo: { bsonType: 'string', pattern: '^[A-Z]-[0-9]{3}$' },
+    residenteId: { bsonType: 'string', description: 'id de la persona en Gestión (uuid); es el del contrato ia.yaml' },
+    residenteSub: { bsonType: 'string', description: 'sub de Keycloak: un RESIDENTE solo retira su propio perfil (I1)' },
+    unidadId: { bsonType: 'string', description: 'id de la unidad en Gestión (uuid)' },
+    unidadCodigo: { bsonType: 'string', pattern: '^[A-Z]-[0-9]{3}$', description: 'opcional, solo informativo' },
     nombre: { bsonType: 'string' },
     consentimiento: {
       bsonType: 'object',
@@ -66,6 +68,7 @@ asegurar('perfiles_faciales', {
     { properties: { embeddings: { maxItems: 0 } } },
   ],
 });
+ia.perfiles_faciales.createIndex({ residenteId: 1 }, { unique: true });
 ia.perfiles_faciales.createIndex({ residenteSub: 1 }, { unique: true });
 ia.perfiles_faciales.createIndex({ unidadCodigo: 1 });
 
@@ -126,10 +129,11 @@ asegurar('predicciones', {
     tipo: { enum: ['ROSTRO', 'PLACA'] },
     resultado: {
       bsonType: 'object',
-      description: 'ROSTRO: {residenteSub|null, reconocido}; PLACA: {texto, bbox}',
+      description: 'ROSTRO: {zona: RECONOCIDO|DUDOSO|DESCONOCIDO, residenteId|null}; PLACA: {texto, bbox}',
     },
     confianza,
     umbral: confianza,
+    umbralBajo: confianza,
     modelo: modeloRef,
     origen: { enum: ['CAMARA_PORTERIA', 'APP_GUARDIA', 'PRUEBA'] },
     camara: { bsonType: 'string' },
@@ -179,10 +183,10 @@ asegurar('reportes', {
       pattern: '^\\s*(query\\b|\\{)',
       description: 'G4: solo lectura; nunca mutation',
     },
-    formato: { enum: ['XLSX', 'PDF'] },
+    formato: { enum: ['EXCEL', 'PDF'] },
     archivoKey: { bsonType: 'string' },
-    estado: { enum: ['TRANSCRIBIENDO', 'CONSULTANDO', 'GENERANDO', 'LISTO', 'ERROR'] },
-    error: { bsonType: 'string' },
+    estado: { enum: ['PROCESANDO', 'LISTO', 'FALLIDO'], description: 'mismos valores que ia.yaml' },
+    motivoFallo: { bsonType: 'string' },
     creadoEn: { bsonType: 'date' },
     terminadoEn: { bsonType: 'date' },
   },

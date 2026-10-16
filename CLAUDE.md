@@ -39,7 +39,7 @@ ml/                           # entrenamiento (no se despliega con el servicio)
 | Código | Resumen |
 |---|---|
 | I1 | Solo rostros de residentes con consentimiento explícito (fecha + versión del texto). Retiro → borrar fotos y embeddings en < 24 h |
-| I2 | Reconocido = similitud coseno ≥ umbral calibrado (inicial 0.70; valor final documentado en `ml/README.md`) |
+| I2 | Tres zonas por similitud coseno: ≥ alto (0.70) `RECONOCIDO`; entre bajo (0.50) y alto `DUDOSO` (decide el guardia, no se guarda como desconocido); < bajo `DESCONOCIDO`. Valores finales en `ml/README.md` |
 | I3 | Embeddings de desconocidos se guardan 30 días (índice TTL en MongoDB) |
 | I4 | DBSCAN nocturno (coseno) sobre desconocidos de 30 días; clúster con ≥ 3 apariciones en días distintos → evento `VisitanteRecurrenteDetectado` |
 | I5 | Toda predicción guarda modelo, versión, confianza y fecha |
@@ -98,7 +98,7 @@ uv run python -m app.jobs.agrupar_desconocidos     # job DBSCAN (I4)
 Los endpoints de `ia.yaml` existen y ya están protegidos por rol; su lógica de ML no: responden `501` (`NO_IMPLEMENTADO`), a quitar al implementar cada uno.
 
 - Roles: `GET /salud` cualquiera · `POST /rostros/identificar`, `POST /placas/leer`, `GET /modelos/placas/actual`: GUARDIA, ADMIN · `POST /rostros/registrar`, `POST /reportes/voz`, `GET /reportes/{id}`: ADMIN · `DELETE /rostros/{residenteId}`: ADMIN, RESIDENTE.
-- `TODO(regla)`: el RESIDENTE solo debe retirar SU consentimiento (I1); falta definir cómo se enlaza el `sub` del token con `residenteId`.
+- Enlace token → residente (cerrado): `POST /rostros/registrar` recibe `residenteId` (uuid de Gestión) y `residenteSub`; el perfil guarda ambos y `DELETE /rostros/{residenteId}` deja pasar a un RESIDENTE solo si su `sub` es el `residenteSub` del perfil. Aún por implementar en el caso de uso.
 - JWT: `app/infrastructure/keycloak.py` (JWKS, RS256, `exp`, `iss`); dependencia `requiere_rol(...)` en `app/api/seguridad.py`; errores problem+json en `app/api/problemas.py`. Un test compara las rutas con `ia.yaml`.
 - Comandos reales (no hay `uv` en la máquina de Luis): `py -3.11 -m venv .venv`, `.venv\Scripts\python -m pip install -e ".[dev]"`, `... -m uvicorn app.main:app --port 8083`, `... -m pytest` (38 tests), `... -m ruff check .`, `... -m mypy`. Sin torch todavía.
 - Variables: `KEYCLOAK_ISSUER`, `KEYCLOAK_JWKS`. Por el gateway: `http://localhost:8080/ia/salud` con Bearer.

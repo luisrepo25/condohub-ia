@@ -15,6 +15,7 @@ class Salud(BaseModel):
 
 class ResultadoRostro(StrEnum):
     RECONOCIDO = "RECONOCIDO"
+    DUDOSO = "DUDOSO"
     DESCONOCIDO = "DESCONOCIDO"
     SIN_ROSTRO = "SIN_ROSTRO"
 
