@@ -1,0 +1,21 @@
+# DBSCAN sobre desconocidos simulados con fotos de LFW (la respuesta es conocida). I3, I4.
+nombre: dbscan_desconocidos
+semilla: 42
+lfw_min_fotos: 10              # personas de LFW con al menos esta cantidad de fotos
+proporciones: [0.5, 0.2, 0.3]  # personas: ajuste (train) / sin uso (val) / prueba (test). Nunca se comparten
+ventana_dias: 30               # I3: los desconocidos viven 30 días
+min_samples: 3                 # I4: mínimo de apariciones para formar clúster
+min_apariciones: 3             # I4
+min_dias: 3                    # I4: días distintos
+escenario_ajuste:              # con estas personas se elige eps
+  recurrentes: 12
+  mismo_dia: 5
+  dos_dias: 5
+  sueltos: 30
+escenario_prueba:              # con personas NUNCA vistas al elegir eps se mide el resultado
+  recurrentes: 6
+  mismo_dia: 3
+  dos_dias: 3
+  sueltos: 12
+repeticiones: 5                # escenarios de prueba con distinta semilla
+eps_grid: [0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.8]

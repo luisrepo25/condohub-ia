@@ -1,0 +1,419 @@
+{
+  "config": {
+    "nombre": "dbscan_desconocidos",
+    "semilla": 42,
+    "lfw_min_fotos": 10,
+    "proporciones": [
+      0.5,
+      0.2,
+      0.3
+    ],
+    "ventana_dias": 30,
+    "min_samples": 3,
+    "min_apariciones": 3,
+    "min_dias": 3,
+    "escenario_ajuste": {
+      "recurrentes": 12,
+      "mismo_dia": 5,
+      "dos_dias": 5,
+      "sueltos": 30
+    },
+    "escenario_prueba": {
+      "recurrentes": 6,
+      "mismo_dia": 3,
+      "dos_dias": 3,
+      "sueltos": 12
+    },
+    "repeticiones": 5,
+    "eps_grid": [
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.8
+    ]
+  },
+  "eps_codo": 0.29116034507751465,
+  "eps_elegido": 0.4,
+  "fotos": 4324,
+  "personas": 158,
+  "personas_ajuste": 79,
+  "personas_prueba": 47,
+  "barrido_ajuste": [
+    {
+      "eps": 0.15,
+      "clusters": 9,
+      "ruido": 103,
+      "silhouette": 0.7906599044799805,
+      "alertas": 6,
+      "aciertos": 6,
+      "falsas_alarmas": 0,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 6,
+      "precision": 1.0,
+      "recall": 0.5,
+      "pureza_media": 1.0
+    },
+    {
+      "eps": 0.2,
+      "clusters": 15,
+      "ruido": 70,
+      "silhouette": 0.7270264625549316,
+      "alertas": 9,
+      "aciertos": 9,
+      "falsas_alarmas": 0,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 9,
+      "precision": 1.0,
+      "recall": 0.75,
+      "pureza_media": 1.0
+    },
+    {
+      "eps": 0.25,
+      "clusters": 19,
+      "ruido": 53,
+      "silhouette": 0.704112708568573,
+      "alertas": 10,
+      "aciertos": 10,
+      "falsas_alarmas": 0,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 10,
+      "precision": 1.0,
+      "recall": 0.8333333333333334,
+      "pureza_media": 1.0
+    },
+    {
+      "eps": 0.3,
+      "clusters": 20,
+      "ruido": 46,
+      "silhouette": 0.688853919506073,
+      "alertas": 11,
+      "aciertos": 11,
+      "falsas_alarmas": 0,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 11,
+      "precision": 1.0,
+      "recall": 0.9166666666666666,
+      "pureza_media": 1.0
+    },
+    {
+      "eps": 0.35,
+      "clusters": 20,
+      "ruido": 42,
+      "silhouette": 0.663398027420044,
+      "alertas": 12,
+      "aciertos": 11,
+      "falsas_alarmas": 1,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 11,
+      "precision": 0.9166666666666666,
+      "recall": 0.9166666666666666,
+      "pureza_media": 0.9583333333333334
+    },
+    {
+      "eps": 0.4,
+      "clusters": 20,
+      "ruido": 34,
+      "silhouette": 0.6256459951400757,
+      "alertas": 13,
+      "aciertos": 12,
+      "falsas_alarmas": 1,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 12,
+      "precision": 0.9230769230769231,
+      "recall": 1.0,
+      "pureza_media": 0.9461538461538462
+    },
+    {
+      "eps": 0.45,
+      "clusters": 18,
+      "ruido": 31,
+      "silhouette": 0.5793549418449402,
+      "alertas": 12,
+      "aciertos": 10,
+      "falsas_alarmas": 2,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 10,
+      "precision": 0.8333333333333334,
+      "recall": 0.8333333333333334,
+      "pureza_media": 0.8747474747474747
+    },
+    {
+      "eps": 0.5,
+      "clusters": 18,
+      "ruido": 28,
+      "silhouette": 0.5543961524963379,
+      "alertas": 12,
+      "aciertos": 9,
+      "falsas_alarmas": 3,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 9,
+      "precision": 0.75,
+      "recall": 0.75,
+      "pureza_media": 0.8506944444444445
+    },
+    {
+      "eps": 0.55,
+      "clusters": 16,
+      "ruido": 21,
+      "silhouette": 0.45145347714424133,
+      "alertas": 10,
+      "aciertos": 7,
+      "falsas_alarmas": 3,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 7,
+      "precision": 0.7,
+      "recall": 0.5833333333333334,
+      "pureza_media": 0.8434027777777778
+    },
+    {
+      "eps": 0.6,
+      "clusters": 12,
+      "ruido": 13,
+      "silhouette": 0.2718930244445801,
+      "alertas": 8,
+      "aciertos": 3,
+      "falsas_alarmas": 5,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 3,
+      "precision": 0.375,
+      "recall": 0.25,
+      "pureza_media": 0.6853858667537913
+    },
+    {
+      "eps": 0.65,
+      "clusters": 2,
+      "ruido": 5,
+      "silhouette": 0.07677290588617325,
+      "alertas": 1,
+      "aciertos": 0,
+      "falsas_alarmas": 1,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "pureza_media": 0.06976744186046512
+    },
+    {
+      "eps": 0.7,
+      "clusters": 1,
+      "ruido": 1,
+      "silhouette": null,
+      "alertas": 1,
+      "aciertos": 0,
+      "falsas_alarmas": 1,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "pureza_media": 0.06569343065693431
+    },
+    {
+      "eps": 0.8,
+      "clusters": 1,
+      "ruido": 0,
+      "silhouette": null,
+      "alertas": 1,
+      "aciertos": 0,
+      "falsas_alarmas": 1,
+      "recurrentes_reales": 12,
+      "recurrentes_detectados": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "pureza_media": 0.06521739130434782
+    }
+  ],
+  "prueba": {
+    "eps_elegido": {
+      "eps": 0.4,
+      "por_semilla": [
+        {
+          "alertas": 6,
+          "aciertos": 6,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 1.0,
+          "recall": 1.0,
+          "pureza_media": 1.0,
+          "clusters": 12,
+          "ruido": 14,
+          "silhouette": 0.7098210453987122,
+          "semilla": 42
+        },
+        {
+          "alertas": 5,
+          "aciertos": 4,
+          "falsas_alarmas": 1,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 4,
+          "precision": 0.8,
+          "recall": 0.6666666666666666,
+          "pureza_media": 0.9384615384615385,
+          "clusters": 10,
+          "ruido": 16,
+          "silhouette": 0.6286316514015198,
+          "semilla": 43
+        },
+        {
+          "alertas": 7,
+          "aciertos": 6,
+          "falsas_alarmas": 1,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 0.8571428571428571,
+          "recall": 1.0,
+          "pureza_media": 0.9428571428571428,
+          "clusters": 11,
+          "ruido": 15,
+          "silhouette": 0.6689600348472595,
+          "semilla": 44
+        },
+        {
+          "alertas": 6,
+          "aciertos": 6,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 1.0,
+          "recall": 1.0,
+          "pureza_media": 1.0,
+          "clusters": 12,
+          "ruido": 14,
+          "silhouette": 0.7342324256896973,
+          "semilla": 45
+        },
+        {
+          "alertas": 6,
+          "aciertos": 6,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 1.0,
+          "recall": 1.0,
+          "pureza_media": 1.0,
+          "clusters": 11,
+          "ruido": 18,
+          "silhouette": 0.6713425517082214,
+          "semilla": 46
+        }
+      ],
+      "precision": {
+        "media": 0.9314285714285713,
+        "desviacion": 0.08590455073355947
+      },
+      "recall": {
+        "media": 0.9333333333333332,
+        "desviacion": 0.13333333333333336
+      },
+      "alertas": {
+        "media": 6.0,
+        "desviacion": 0.6324555320336759
+      },
+      "ruido": {
+        "media": 15.4,
+        "desviacion": 1.4966629547095764
+      }
+    },
+    "eps_codo": {
+      "eps": 0.291,
+      "por_semilla": [
+        {
+          "alertas": 6,
+          "aciertos": 6,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 1.0,
+          "recall": 1.0,
+          "pureza_media": 1.0,
+          "clusters": 11,
+          "ruido": 18,
+          "silhouette": 0.7268009781837463,
+          "semilla": 42
+        },
+        {
+          "alertas": 5,
+          "aciertos": 5,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 5,
+          "precision": 1.0,
+          "recall": 0.8333333333333334,
+          "pureza_media": 1.0,
+          "clusters": 11,
+          "ruido": 17,
+          "silhouette": 0.6606718301773071,
+          "semilla": 43
+        },
+        {
+          "alertas": 6,
+          "aciertos": 6,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 1.0,
+          "recall": 1.0,
+          "pureza_media": 1.0,
+          "clusters": 10,
+          "ruido": 23,
+          "silhouette": 0.7261810898780823,
+          "semilla": 44
+        },
+        {
+          "alertas": 6,
+          "aciertos": 6,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 6,
+          "precision": 1.0,
+          "recall": 1.0,
+          "pureza_media": 1.0,
+          "clusters": 12,
+          "ruido": 15,
+          "silhouette": 0.7408782839775085,
+          "semilla": 45
+        },
+        {
+          "alertas": 4,
+          "aciertos": 4,
+          "falsas_alarmas": 0,
+          "recurrentes_reales": 6,
+          "recurrentes_detectados": 4,
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "pureza_media": 1.0,
+          "clusters": 10,
+          "ruido": 26,
+          "silhouette": 0.7035463452339172,
+          "semilla": 46
+        }
+      ],
+      "precision": {
+        "media": 1.0,
+        "desviacion": 0.0
+      },
+      "recall": {
+        "media": 0.9,
+        "desviacion": 0.13333333333333336
+      },
+      "alertas": {
+        "media": 5.4,
+        "desviacion": 0.8
+      },
+      "ruido": {
+        "media": 19.8,
+        "desviacion": 4.069397989875161
+      }
+    }
+  },
+  "nota": "Simulación con fotos de LFW: las medidas son orientativas frente a una portería real."
+}
