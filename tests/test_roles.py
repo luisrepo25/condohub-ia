@@ -19,6 +19,7 @@ class Endpoint:
     ruta: str
     permitidos: frozenset[str]
     kwargs: dict[str, Any] = field(default_factory=dict)
+    implementado: bool = False   # los implementados ya no responden 501; sigue valiendo 401/403 por rol
 
 
 ENDPOINTS = [
@@ -46,7 +47,13 @@ ENDPOINTS = [
     ),
     Endpoint("I1_retirar_consentimiento", "DELETE", f"/rostros/{UUID_X}", frozenset({"ADMIN", "RESIDENTE"})),
     Endpoint("A4_leer_placa", "POST", "/placas/leer", frozenset({"GUARDIA", "ADMIN"}), {"files": IMAGEN}),
-    Endpoint("A4_modelo_placas", "GET", "/modelos/placas/actual", frozenset({"GUARDIA", "ADMIN"})),
+    Endpoint(
+        "A4_modelo_placas",
+        "GET",
+        "/modelos/placas/actual",
+        frozenset({"GUARDIA", "ADMIN"}),
+        implementado=True,
+    ),
     Endpoint(
         "G4_crear_reporte_por_voz",
         "POST",
@@ -76,13 +83,17 @@ def test_cada_rol_solo_usa_lo_que_le_toca(
         headers={"Authorization": f"Bearer {crear_token(rol)}"},
         **endpoint.kwargs,
     )
-    esperado = 501 if rol in endpoint.permitidos else 403
-    assert r.status_code == esperado, f"{rol} en {endpoint.nombre}"
-    assert r.headers["content-type"].startswith("application/problem+json")
+    if rol in endpoint.permitidos and endpoint.implementado:
+        assert r.status_code not in (401, 403), f"{rol} en {endpoint.nombre}"
+    else:
+        esperado = 501 if rol in endpoint.permitidos else 403
+        assert r.status_code == esperado, f"{rol} en {endpoint.nombre}"
+    if r.status_code >= 400:
+        assert r.headers["content-type"].startswith("application/problem+json")
 
 
 def test_los_501_se_identifican_como_no_implementado(client: TestClient, crear_token: CrearToken) -> None:
-    r = client.get("/modelos/placas/actual", headers={"Authorization": f"Bearer {crear_token('GUARDIA')}"})
+    r = client.get(f"/reportes/{UUID_X}", headers={"Authorization": f"Bearer {crear_token('ADMIN')}"})
     assert r.json()["code"] == "NO_IMPLEMENTADO"
 
 
