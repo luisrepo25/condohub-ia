@@ -7,7 +7,7 @@ llaman a `ml/src` y no duplican código. Datasets, fotos y pesos **no se version
 
 **El modelo del servicio es FaceNet preentrenado en VGGFace2 (InceptionResnetV1), sin ajuste propio.** El ajuste fino con LFW no
 se adopta: su mejora no es concluyente y, en las pruebas con personas reales, separó peor a los desconocidos (ver abajo).
-Se compara por similitud coseno contra los embeddings registrados; el umbral final de la regla I2 **sigue sin definirse** (ver «Pendiente»).
+Se compara por similitud coseno contra los embeddings registrados; la regla I2 usa **tres zonas con los valores iniciales 0,70 y 0,50**, que la medición con el equipo respalda (sección 6); se revalidan con Erick y con más personas.
 
 ## Notebooks (en `notebooks/`, se ejecutan en Colab, de arriba abajo)
 
@@ -16,6 +16,9 @@ Se compara por similitud coseno contra los embeddings registrados; el umbral fin
 | `01_linea_base_facial.ipynb` | Línea base con LFW (embeddings congelados + SVM/k-NN, verificación 1:1) |
 | `02_registro_propios.ipynb` | Registro de personas del equipo por embeddings y evaluación dejando una sesión fuera |
 | `03_finetuning_facial.ipynb` | Ajuste fino con triplet loss (semi-hard), comparación contra la base y repetición con 5 semillas |
+| `04_placas.ipynb` | Placas: YOLOv8n ajustado (mAP en prueba) + OCR medido con placas sintéticas de formato A4 (4 dígitos + 3 letras) |
+| `06_registro_equipo.ipynb` | Registra a las personas del equipo (una carpeta por persona; sirve para cualquier número) y mide las tres zonas de I2 contra extraños de LFW y «compañeros no registrados». Fotos preparadas con `python -m ml.src.preparar_fotos` |
+| `05_dbscan_desconocidos.ipynb` | Visitantes recurrentes: DBSCAN (coseno) sobre desconocidos simulados con fotos de LFW; elige `eps` y mide las alertas de I4 |
 
 Lo que sale de cada corrida (`metrics.json` y similares) se copia a `experiments/<fecha>_<nombre>/` y **sí se versiona**.
 
@@ -83,14 +86,95 @@ suficiente para no fiarse del umbral calibrado solo con LFW. Con las fotos propi
 
 La base separa mejor que el ajustado (entrenado con LFW). Esta prueba registra con una sola sesión, por lo que los puntajes propios con las 90 fotos serían algo mejores.
 
+### 4. Placas: detección (YOLOv8n) y lectura (OCR)
+
+Notebook `04_placas.ipynb`. Detector ajustado desde COCO con *Car License Plate Detection* (433 imágenes, una clase, CC0; **no hay placas bolivianas**),
+partición 303 / 65 / 65 por imagen, 60 épocas (mejor en la 40), semilla 42. Detalle: `experiments/2026-10-15_placas_deteccion/` (`metrics.json`, curvas).
+Pesos (`yolov8n_placas.pt`, 6,5 MB) fuera de git. COCO no tiene la clase «placa», así que no existe un detector preentrenado con el que comparar.
+
+| Detección en las 65 imágenes de prueba (70 placas) | Valor |
+|---|---|
+| mAP@0.5 | 0,931 |
+| mAP@0.5-0.95 | 0,519 |
+| Precisión / recall | 0,937 / 0,857 |
+
+Lectura con EasyOCR sobre **300 placas sintéticas** de formato A4 (4 dígitos + 3 letras; texto conocido, optimistas frente a placas reales):
+
+| Paso | Precisión por carácter | Placa completa |
+|---|---|---|
+| OCR crudo | 99,48 % | 96,7 % |
+| + extraer la ventana con el formato (descarta el marco leído como caracteres) | 99,95 % | **99,67 %** |
+| + corrección letra/dígito por posición | 99,95 % | 99,67 % (no aporta en este conjunto) |
+
+Una sola falla: un dígito mal leído, que ningún formato detecta. Las 300 lecturas finales cumplen el formato.
+
+**Foto real boliviana** (una imagen, cualitativa, no es una métrica; la foto no se versiona): placa `2608ZYU`.
+- Con margen añadido (la placa deja de ser primer plano): una caja con 0,84, lectura `2608ZYU`, confianza OCR 0,76. El OCR leyó `26082YU` y la corrección por posición devolvió la `Z`.
+- En primer plano el detector da cajas parciales (nunca vio placas así de grandes); una lectura correcta (0,72) y otra rechazada por no cumplir el formato, sin inventar nada.
+- Con A4 en 0,85 esta placa bien leída no habría abierto sola (0,72–0,76): **decisión pendiente del equipo** sobre ese umbral.
+
+Lecciones: pasar al detector una imagen PIL (RGB) y no un arreglo RGB (Ultralytics espera BGR); la corrección por posición convierte cualquier palabra de 7 letras en «placa» (`BOLIVIA` → `8011VIA`), por eso `elegir_placa` la limita a 2 cambios y excluye el rótulo.
+
+### 5. No supervisado: DBSCAN sobre desconocidos (I3, I4)
+
+Notebook `05_dbscan_desconocidos.ipynb`; detalle en `experiments/2026-10-15_dbscan_desconocidos/` (métricas y tres figuras).
+**Es una simulación**: los desconocidos son fotos de LFW (4324 fotos, 158 personas, embeddings FaceNet) repartidas en una ventana de 30 días,
+de modo que se sabe quién es quién. Cuatro tipos de persona: recurrente (3–6 días distintos, debe alertar), mismo día (4 apariciones en un día),
+dos días y suelta (ninguna debe alertar). `eps` se elige con 79 personas («ajuste») y se mide con otras 47 que nunca se usaron («prueba»),
+en 5 escenarios con distinta semilla (6 recurrentes reales cada uno, 30 en total). `min_samples` = 3 (I4).
+
+- **Elección de `eps`:** el codo del gráfico k-distance da **0,291**. El barrido sobre las personas de ajuste da una meseta entre 0,25 y 0,40
+  (F1 de 0,91 a 0,96) y cae desde 0,45 porque se mezclan personas distintas. El mejor F1 exacto fue 0,40 (0,960) frente a 0,30 (0,957).
+- **Medición con personas nuevas** (media de 5 escenarios):
+
+| `eps` | Alertas | Aciertos | Falsas alarmas | Recurrentes detectados | Precisión | Recall |
+|---|---|---|---|---|---|---|
+| 0,40 (mejor F1 en el ajuste) | 30 | 28 | 2 | 28 de 30 | 0,93 ± 0,09 | 0,93 ± 0,13 |
+| 0,291 (codo, sin etiquetas) | 27 | 27 | 0 | 27 de 30 | 1,00 ± 0,00 | 0,90 ± 0,13 |
+
+Las diferencias son de una alerta sobre 30, dentro de la variación entre escenarios: no hay un ganador claro. Lo relevante es que el `eps` elegido **sin etiquetas**
+(codo) rinde igual que el elegido con ellas, que es lo único posible en una portería real. Valor inicial propuesto: **0,30**, como parámetro configurable (no
+constante). Se eligió mirando también los resultados de prueba: presentarlos los dos en el informe.
+- **La regla de días distintos de I4 es la que evita falsas alarmas:** las personas que vienen varias veces el mismo día o solo dos días sí forman
+  clústeres densos (en `clusters_pca.png`, clústeres 6–11), pero no alertan.
+- **Límites:** simulación con LFW (fotos más variadas que las de una cámara fija de portería); 2 dimensiones de PCA solo ilustran; muestra pequeña
+  (30 recurrentes), por eso las desviaciones son grandes; en dos escenarios se pierde un recurrente cuyas fotos varían mucho.
+
+### 6. Registro del equipo y las tres zonas de I2
+
+Notebook `06_registro_equipo.ipynb`; detalle en `experiments/2026-10-15_registro_equipo/` (`metrics.json` e `histograma_similitudes.png`).
+Registradas **dos personas** (Aldana: 50 fotos en 4 sesiones por fecha, de 2022 a 2023; Luis: 98 fotos en 2 sesiones de luz), 139 fotos con rostro detectado
+(49/50 y 90/98). Se evalúa dejando una sesión entera fuera. Extraños: 790 fotos de 158 personas de LFW, mitad para calibrar y mitad para medir.
+«Compañero no registrado» = fotos de una persona contra el registro de la otra: el «amigo parecido» que dejó mal parado al umbral calibrado solo con LFW.
+Los consentimientos son los borradores (`borrador-1` y `borrador-2`): pendiente el texto definitivo.
+
+| Rostro → zona | Regla (alto 0,70 / bajo 0,50) | Calibrado con LFW (alto 0,584 / bajo 0,447) |
+|---|---|---|
+| Propios: RECONOCIDO correcto | 85,6 % | 92,8 % |
+| Propios: RECONOCIDO como otra persona | 0,0 % | 0,7 % (1 foto) |
+| Propios: DUDOSO / DESCONOCIDO | 9,3 % / 5,0 % | 2,2 % / 4,3 % |
+| **Compañero no registrado: RECONOCIDO (error grave)** | **5,8 %** | **59,7 %** |
+| Compañero no registrado: DUDOSO / DESCONOCIDO | 76,3 % / 18,0 % | 29,5 % / 10,8 % |
+| Extraños de LFW: DESCONOCIDO | 97,7 % | 92,4 % |
+| Extraños de LFW: RECONOCIDO | 0,0 % | 0,5 % |
+
+- **Calibrar solo con LFW es peligroso:** el umbral sale en 0,58 y reconocería por error a 6 de cada 10 compañeros parecidos. Los extraños de LFW (similitud ~0,3)
+  no se parecen a los residentes; los compañeros se concentran en 0,5–0,7 y los propios en 0,8–0,9 (`histograma_similitudes.png`).
+- **Los valores de la regla (0,70 y 0,50) se mantienen:** casi no hay falsos reconocimientos y los parecidos caen en DUDOSO, donde decide el guardia (A5). El costo es que
+  ~14 % de las fotos propias requieren decisión del guardia. Con un solo umbral habría que elegir entre confundir parecidos o no reconocer residentes.
+- Con el umbral único de 0,584: FAR 0,51 % en LFW, FRR 7,2 % y **1 confusión** (una foto de la sesión 4 de Aldana reconocida como Luis). Los rechazos de Luis están sobre todo
+  en `Luz alta` (6 de 77), no en `Luz baja` (2 de 13): la luz no parece ser el factor.
+- **Límites:** solo dos personas (el «compañero» es siempre el mismo parecido), 139 fotos propias, y las fotos de Aldana son de hace años y de WhatsApp. No afinar los umbrales con esta muestra;
+  revalidar con Erick (tres personas) y con fotos recientes de Aldana.
+
 ## Pendiente
 
-1. **Desconocidos reales** para calibrar el umbral: 10 a 15 caras de familiares y amigos (con permiso), y las de Aldana y Erick. Subir también sus fotos para registrarlos.
+1. Las fotos de **Erick** (con consentimiento) y unas 10 **recientes de Aldana** para revalidar las zonas (sección 6). Ya no se pide a terceros: los extraños son datos públicos (LFW) y el «parecido» es el propio equipo.
 2. **Probar otros métodos de comparación**: hoy se toma la foto registrada más parecida; probar el promedio de las k más parecidas o un registro con fotos de buena calidad.
 3. **Filtrar por calidad** las fotos de registro (muy borrosas o con reflejo) y mejorar la detección con poca luz (hoy se pierden 5 de 18).
-4. **Tres zonas en vez de un umbral** (reconocido / dudoso, decide el guardia / desconocido). Cambia la regla I2, así que primero hay que acordarlo en el equipo y escribirlo en `docs/negocio/reglas-de-negocio.md`.
-5. Texto de consentimiento (I1), todavía inexistente, antes de tomar fotos de más personas.
-6. Dataset de placas, DBSCAN con datos reales y exportación ONNX.
+4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir) y revalidar con tres personas.
+5. Texto de consentimiento (I1): existe como borrador (`docs/negocio/consentimiento-facial.md`); completar los campos entre corchetes y que los tres firmen la misma versión.
+6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 y exportar a ONNX int8. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
 
 ## Datos personales
 

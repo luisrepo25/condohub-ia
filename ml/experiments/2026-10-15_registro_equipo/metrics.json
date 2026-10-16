@@ -1,0 +1,163 @@
+{
+  "config": {
+    "nombre": "registro_equipo",
+    "semilla": 42,
+    "carpeta_propios": "datos/propios",
+    "lfw_min_fotos": 10,
+    "lfw_fotos_por_persona": 5,
+    "far_alto": 0.01,
+    "far_bajo": 0.1,
+    "umbrales_regla": {
+      "alto": 0.7,
+      "bajo": 0.5
+    }
+  },
+  "personas": {
+    "aldana": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-2"
+      },
+      "fotos_por_sesion": {
+        "sesion1_2022-03-27_a_2022-06-01": 13,
+        "sesion2_2022-06-02_a_2022-07-30": 13,
+        "sesion3_2022-07-30_a_2022-09-23": 12,
+        "sesion4_2022-09-24_a_2023-05-05": 12
+      },
+      "rostro_detectado": {
+        "sesion1_2022-03-27_a_2022-06-01": "13/13",
+        "sesion2_2022-06-02_a_2022-07-30": "13/13",
+        "sesion3_2022-07-30_a_2022-09-23": "11/12",
+        "sesion4_2022-09-24_a_2023-05-05": "12/12"
+      }
+    },
+    "luis": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-1"
+      },
+      "fotos_por_sesion": {
+        "Luz alta": 80,
+        "Luz baja": 18
+      },
+      "rostro_detectado": {
+        "Luz alta": "77/80",
+        "Luz baja": "13/18"
+      }
+    }
+  },
+  "fotos_usables": 139,
+  "extranos_lfw": {
+    "fotos": 790,
+    "personas": 158
+  },
+  "zonas": {
+    "regla_inicial": {
+      "alto": 0.7,
+      "bajo": 0.5,
+      "genuinos": {
+        "reconocido_correcto": 0.8561151079136691,
+        "reconocido_otra_persona": 0.0,
+        "dudoso_candidato_correcto": 0.08633093525179857,
+        "dudoso_candidato_otra_persona": 0.007194244604316547,
+        "desconocido": 0.050359712230215826,
+        "fotos": 139
+      },
+      "companeros_no_registrados": {
+        "RECONOCIDO": 0.05755395683453238,
+        "DUDOSO": 0.762589928057554,
+        "DESCONOCIDO": 0.17985611510791366
+      },
+      "extranos_prueba": {
+        "RECONOCIDO": 0.0,
+        "DUDOSO": 0.02278481012658228,
+        "DESCONOCIDO": 0.9772151898734177
+      }
+    },
+    "calibrado_con_extranos": {
+      "alto": 0.584327757358551,
+      "bajo": 0.4471518099308014,
+      "genuinos": {
+        "reconocido_correcto": 0.9280575539568345,
+        "reconocido_otra_persona": 0.007194244604316547,
+        "dudoso_candidato_correcto": 0.02158273381294964,
+        "dudoso_candidato_otra_persona": 0.0,
+        "desconocido": 0.04316546762589928,
+        "fotos": 139
+      },
+      "companeros_no_registrados": {
+        "RECONOCIDO": 0.5971223021582733,
+        "DUDOSO": 0.2949640287769784,
+        "DESCONOCIDO": 0.1079136690647482
+      },
+      "extranos_prueba": {
+        "RECONOCIDO": 0.005063291139240506,
+        "DUDOSO": 0.07088607594936709,
+        "DESCONOCIDO": 0.9240506329113924
+      }
+    }
+  },
+  "registro_umbral_unico": {
+    "umbral_calibrado_con_impostores_de_validacion": 0.584327757358551,
+    "far_maximo_pedido": 0.01,
+    "far_prueba": 0.005063291139240506,
+    "impostores": {
+      "validacion": 395,
+      "prueba": 395
+    },
+    "frr": 0.07194244604316546,
+    "confusiones": 1,
+    "por_sesion": [
+      {
+        "persona": "aldana",
+        "sesion": "sesion1_2022-03-27_a_2022-06-01",
+        "fotos": 13,
+        "reconocidas": 13,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion2_2022-06-02_a_2022-07-30",
+        "fotos": 13,
+        "reconocidas": 13,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion3_2022-07-30_a_2022-09-23",
+        "fotos": 11,
+        "reconocidas": 10,
+        "rechazadas": 1,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion4_2022-09-24_a_2023-05-05",
+        "fotos": 12,
+        "reconocidas": 11,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 1
+      },
+      {
+        "persona": "luis",
+        "sesion": "Luz alta",
+        "fotos": 77,
+        "reconocidas": 71,
+        "rechazadas": 6,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "luis",
+        "sesion": "Luz baja",
+        "fotos": 13,
+        "reconocidas": 11,
+        "rechazadas": 2,
+        "confundidas_con_otra_persona": 0
+      }
+    ],
+    "sesiones_omitidas_por_ser_la_unica": []
+  },
+  "sesiones_omitidas": []
+}

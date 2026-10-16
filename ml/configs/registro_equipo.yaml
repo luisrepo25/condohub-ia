@@ -1,0 +1,11 @@
+# Registro de las personas del equipo por embeddings y evaluación de las tres zonas de I2. I1, I2, A5.
+nombre: registro_equipo
+semilla: 42
+carpeta_propios: datos/propios    # dentro de ML_DATA_DIR (privado): propios/<persona>/<sesion>/foto.jpg + consentimiento.json
+lfw_min_fotos: 10                 # personas de LFW que actúan como extraños
+lfw_fotos_por_persona: 5          # basta con pocas fotos por extraño (acelera los embeddings)
+far_alto: 0.01                    # a lo sumo 1 % de extraños llega a RECONOCIDO
+far_bajo: 0.10                    # a lo sumo 10 % de extraños llega a DUDOSO o más
+umbrales_regla:                   # valores iniciales de I2 en reglas-de-negocio.md
+  alto: 0.70
+  bajo: 0.50
