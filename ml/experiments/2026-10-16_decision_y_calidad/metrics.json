@@ -1,0 +1,107 @@
+{
+  "config": {
+    "nombre": "registro_equipo",
+    "semilla": 42,
+    "carpeta_propios": "datos/propios",
+    "lfw_min_fotos": 10,
+    "lfw_fotos_por_persona": 5,
+    "far_alto": 0.01,
+    "far_bajo": 0.1,
+    "umbrales_regla": {
+      "alto": 0.7,
+      "bajo": 0.5
+    }
+  },
+  "fotos_usables": 191,
+  "personas": {
+    "aldana": 59,
+    "erick": 42,
+    "luis": 90
+  },
+  "extranos_lfw": {
+    "fotos": 790,
+    "personas": 158
+  },
+  "metodos": {
+    "máximo (actual)": {
+      "identidad_correcta": 0.9895287958115183,
+      "auc_propios_vs_companeros": 0.9291137852580795,
+      "auc_propios_vs_extranos": 0.9908145006295977,
+      "reconocidos_con_5pct_companeros": 0.8691099476439791,
+      "umbral_en_ese_punto": 0.7144543528556824
+    },
+    "top-3 promedio": {
+      "identidad_correcta": 0.9790575916230366,
+      "auc_propios_vs_companeros": 0.9152846687316686,
+      "auc_propios_vs_extranos": 0.9889720988799788,
+      "reconocidos_con_5pct_companeros": 0.8272251308900523,
+      "umbral_en_ese_punto": 0.7032049894332886
+    },
+    "centroide": {
+      "identidad_correcta": 0.9790575916230366,
+      "auc_propios_vs_companeros": 0.9432581343713166,
+      "auc_propios_vs_extranos": 0.9926303930015243,
+      "reconocidos_con_5pct_companeros": 0.8691099476439791,
+      "umbral_en_ese_punto": 0.6387735605239868
+    },
+    "SVM lineal": {
+      "identidad_correcta": 0.9895287958115183,
+      "auc_propios_vs_companeros": 0.881993366409912,
+      "auc_propios_vs_extranos": 0.6579097355689575,
+      "reconocidos_con_5pct_companeros": 0.4816753926701571,
+      "umbral_en_ese_punto": 0.965214150870834
+    },
+    "k-NN (k=5)": {
+      "identidad_correcta": 0.9738219895287958,
+      "auc_propios_vs_companeros": 0.6366875908006908,
+      "auc_propios_vs_extranos": 0.7436012989595069,
+      "reconocidos_con_5pct_companeros": 0.0,
+      "umbral_en_ese_punto": 1.0000000000000002
+    }
+  },
+  "nitidez": {
+    "spearman_con_puntaje": 0.4913216450812896,
+    "descarte_en_el_registro": [
+      {
+        "descarte_pct": 0,
+        "fotos_registradas": 191,
+        "identidad_correcta": 0.9895287958115183,
+        "auc_propios_vs_companeros": 0.9291137852580795,
+        "auc_propios_vs_extranos": 0.9908145006295977,
+        "reconocidos_con_5pct_companeros": 0.8691099476439791,
+        "umbral_en_ese_punto": 0.7144543528556824,
+        "propios_con_puntaje_bajo_070": 0.10471204188481675
+      },
+      {
+        "descarte_pct": 10,
+        "fotos_registradas": 171,
+        "identidad_correcta": 0.9895287958115183,
+        "auc_propios_vs_companeros": 0.9255228749211919,
+        "auc_propios_vs_extranos": 0.9876996487507456,
+        "reconocidos_con_5pct_companeros": 0.8638743455497382,
+        "umbral_en_ese_punto": 0.7144543528556824,
+        "propios_con_puntaje_bajo_070": 0.1099476439790576
+      },
+      {
+        "descarte_pct": 20,
+        "fotos_registradas": 152,
+        "identidad_correcta": 0.9790575916230366,
+        "auc_propios_vs_companeros": 0.9223842548175762,
+        "auc_propios_vs_extranos": 0.9833786201868912,
+        "reconocidos_con_5pct_companeros": 0.8586387434554974,
+        "umbral_en_ese_punto": 0.7144543528556824,
+        "propios_con_puntaje_bajo_070": 0.12041884816753927
+      },
+      {
+        "descarte_pct": 30,
+        "fotos_registradas": 133,
+        "identidad_correcta": 0.9633507853403142,
+        "auc_propios_vs_companeros": 0.9201913324744387,
+        "auc_propios_vs_extranos": 0.9820531513022732,
+        "reconocidos_con_5pct_companeros": 0.8638743455497382,
+        "umbral_en_ese_punto": 0.7056689858436584,
+        "propios_con_puntaje_bajo_070": 0.13612565445026178
+      }
+    ]
+  }
+}

@@ -187,6 +187,29 @@ Los consentimientos son los borradores (`borrador-1` y `borrador-2`): pendiente 
 - **Límites:** las 4 sesiones de Erick son del mismo día, así que su resultado es optimista (fotos casi iguales entre sí); el «compañero no registrado» son solo tres personas que se
   prestan parecido entre sí, por lo que el 9,4 % es orientativo y no una tasa firme. Los consentimientos son borradores de versiones distintas: unificar el texto definitivo (I1).
 
+### 6b. Cómo decidir «quién es» y calidad de las fotos (16/10/2026)
+
+Notebook `09_decision_y_calidad.ipynb` (resultados en `experiments/2026-10-16_decision_y_calidad/`); código en `ml/src/metodos_decision.py` (extiende `registro.py` y `zonas.py` sin modificarlos). Mismas 191 fotos propias y extraños de LFW
+que la sección 6. Como los puntajes de cada método tienen otra escala, se comparan con métricas que no dependen de ella: AUC y «propios reconocidos si se deja pasar a lo sumo un 5 % de compañeros parecidos».
+
+| Método | Identidad correcta | AUC propios/compañeros | AUC propios/extraños | Reconocidos con ≤5 % compañeros | Umbral en ese punto |
+|---|---|---|---|---|---|
+| **Máximo (el del servicio)** | 0,990 | 0,929 | 0,991 | 0,869 | 0,714 |
+| Promedio de las 3 mejores | 0,979 | 0,915 | 0,989 | 0,827 | 0,703 |
+| Centroide | 0,979 | 0,943 | 0,993 | 0,869 | 0,639 |
+| SVM lineal | 0,990 | 0,882 | 0,658 | 0,482 | 0,965 |
+| k-NN (k = 5) | 0,974 | 0,637 | 0,744 | 0,000 | 1,000 |
+
+- **Se mantiene el máximo.** El centroide empata (misma tasa al 5 %; su ventaja de AUC con tres personas está dentro del ruido) y exigiría recalibrar I2: su punto equivalente cae en 0,64.
+  Con el máximo, el umbral del punto de 5 % (0,714) coincide con el 0,70 de la regla: confirmación independiente de ese valor.
+- **SVM y k-NN identifican bien pero no rechazan extraños** (AUC frente a LFW de 0,66 y 0,74; el k-NN reconoce a todos los compañeros parecidos con probabilidad 1,0): un clasificador de conjunto cerrado
+  siempre elige a alguien, y I2 necesita saber cuándo no es nadie. Por eso la regla usa similitud y no la probabilidad de un clasificador.
+- **Nitidez** (varianza del laplaciano): correlación de Spearman 0,49 con el puntaje de los propios; las fotos con puntaje < 0,70 tienen una nitidez mediana de 67 frente a 166 del resto.
+  Las fotos borrosas, al compararse, puntúan bajo y caen en DUDOSO (decide el guardia, I2).
+- **No registrar las fotos menos nítidas no ayuda; empeora:** al descartar el 0 / 10 / 20 / 30 % del registro, la identidad correcta pasa de 0,990 a 0,990 / 0,979 / 0,963 y los propios con puntaje < 0,70
+  de 10,5 % a 11,0 / 12,0 / 13,6 %. Se pierde más por tener menos variedad de fotos que lo que se gana por calidad. **Se descarta el filtro de calidad en el registro.**
+- **Límites:** tres personas; las 4 sesiones de Erick son del mismo día; los «compañeros» son el propio equipo. Es una comparación orientativa, no una afinación de umbrales.
+
 ### 7. Placas en el dispositivo: ONNX int8
 
 Notebook `07_exportar_onnx_placas.ipynb`; detalle en `experiments/2026-10-15_placas_onnx/` (`metrics.json` y la ficha `modelo_placas.json`). El `.onnx` **no** va a git
@@ -239,8 +262,8 @@ y 316 fotos de extraños de LFW (2 por persona).
 ## Pendiente
 
 1. ~~Fotos de Erick y recientes de Aldana~~: recibidas y usadas en la revalidación de la sección 6 (16/10/2026). Mejorable: fotos de Erick en otros días y con otra luz, porque las 42 son del mismo día.
-2. **Probar otros métodos de comparación**: hoy se toma la foto registrada más parecida; probar el promedio de las k más parecidas o un registro con fotos de buena calidad.
-3. **Filtrar por calidad** las fotos de registro (muy borrosas o con reflejo) y mejorar la detección con poca luz (hoy se pierden 5 de 18).
+2. ~~Probar otros métodos de comparación~~: hecho en la sección 6b; se mantiene la similitud máxima.
+3. ~~Filtrar por calidad las fotos de registro~~: probado en 6b y descartado (empeora). Queda mejorar la detección con poca luz (hoy se pierden 5 de 18) y, si hiciera falta, avisar al guardia cuando la foto de portería sea muy borrosa (la nitidez explica los puntajes bajos).
 4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Revalidadas con tres personas (sección 6). Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir).
 5. Texto de consentimiento (I1): existe como borrador (`docs/negocio/consentimiento-facial.md`); completar los campos entre corchetes y que los tres firmen la misma versión.
 6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** el ONNX solo detecta; EasyOCR no corre en el navegador, hay que decidir con Erick entre Tesseract.js (con lista de caracteres) y exportar el reconocedor a ONNX. El int8 ya se probó en `onnxruntime-web` (WASM, en Node, `ml/web/`): 10 de 10 placas de vehículos detectadas, IoU 0,82–0,99 frente al motor nativo y ~240 ms por imagen en PC; falta medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
