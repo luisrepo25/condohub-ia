@@ -185,7 +185,7 @@ Los consentimientos son los borradores (`borrador-1` y `borrador-2`): pendiente 
 - Las 10 fotos recientes de Aldana se reconocen todas (10/10, sin confusiones) con un registro hecho con fotos de 2022–2023: el perfil resiste el paso de los años.
 - Por persona (umbral único): Erick 42/42, Aldana 47/48 en las sesiones antiguas y 10/10 en la reciente, Luis 82/90 (rechazos: 6 de 77 con luz alta, 2 de 13 con luz baja).
 - **Límites:** las 4 sesiones de Erick son del mismo día, así que su resultado es optimista (fotos casi iguales entre sí); el «compañero no registrado» son solo tres personas que se
-  prestan parecido entre sí, por lo que el 9,4 % es orientativo y no una tasa firme. Los consentimientos son borradores de versiones distintas: unificar el texto definitivo (I1).
+  prestan parecido entre sí, por lo que el 9,4 % es orientativo y no una tasa firme. Los consentimientos son de versiones de borrador distintas; se acepta así (ver «Pendiente», punto 5).
 
 ### 6b. Cómo decidir «quién es» y calidad de las fotos (16/10/2026)
 
@@ -314,7 +314,7 @@ y 316 fotos de extraños de LFW (2 por persona).
 2. ~~Probar otros métodos de comparación~~: hecho en la sección 6b; se mantiene la similitud máxima.
 3. ~~Filtrar por calidad las fotos de registro~~: probado en 6b y descartado (empeora). Queda mejorar la detección con poca luz (hoy se pierden 5 de 18) y, si hiciera falta, avisar al guardia cuando la foto de portería sea muy borrosa (la nitidez explica los puntajes bajos).
 4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Revalidadas con tres personas (sección 6). Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir).
-5. Texto de consentimiento (I1): existe como borrador (`docs/negocio/consentimiento-facial.md`); completar los campos entre corchetes y que los tres firmen la misma versión.
+5. ~~Texto de consentimiento definitivo (I1)~~: **decisión del equipo (16/10/2026): no se exige.** Los tres desarrolladores aportaron sus propias fotos por voluntad propia (proyecto académico); su autorización queda registrada en su `consentimiento.json` (fecha y versión de borrador, que pueden diferir). El mecanismo de I1 sigue vigente: retirar el consentimiento borra fotos y embeddings. Si algún día se registra a una persona ajena al equipo, entonces sí hace falta su consentimiento explícito con el texto de `docs/negocio/consentimiento-facial.md`.
 6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** resuelto en las secciones 6c y 6d (el reconocedor de EasyOCR exportado a ONNX + votación entre franjas, portado a JavaScript; Tesseract.js descartado). Falta publicarlo en el almacén S3 (`GET /modelos/...`), entregárselo a Erick y confirmar con más placas. El int8 ya se probó en `onnxruntime-web` (WASM, en Node, `ml/web/`): 10 de 10 placas de vehículos detectadas, IoU 0,82–0,99 frente al motor nativo y ~240 ms por imagen en PC; falta medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
 
 ## Datos personales
