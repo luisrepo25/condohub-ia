@@ -1,0 +1,14 @@
+{
+  "name": "condohub-ml-web",
+  "private": true,
+  "type": "module",
+  "description": "Referencia en JavaScript del detector de placas ONNX para la PWA del guardia (A4, O6)",
+  "scripts": {
+    "probar": "node probar_placas.mjs"
+  },
+  "dependencies": {
+    "jpeg-js": "0.4.4",
+    "onnxruntime-web": "1.19.2",
+    "pngjs": "^7.0.0"
+  }
+}

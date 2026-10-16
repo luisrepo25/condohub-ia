@@ -168,6 +168,25 @@ Los consentimientos son los borradores (`borrador-1` y `borrador-2`): pendiente 
 - **Límites:** solo dos personas (el «compañero» es siempre el mismo parecido), 139 fotos propias, y las fotos de Aldana son de hace años y de WhatsApp. No afinar los umbrales con esta muestra;
   revalidar con Erick (tres personas) y con fotos recientes de Aldana.
 
+**Revalidación con tres personas (16/10/2026).** Se sumaron las fotos de Erick (42, en 4 bloques del mismo día; consentimiento `borrador-3`) y 10 recientes de Aldana
+(`sesion5_2026-10-15`): 191 fotos propias con rostro (`experiments/2026-10-15_registro_equipo/metrics_3_personas.json` e `histograma_similitudes_3_personas.png`). Misma metodología; las dos primeras columnas son las de la tabla anterior para comparar.
+
+| Rostro → zona | Regla 0,70 / 0,50 (2 personas) | Regla 0,70 / 0,50 (3 personas) | Calibrado con LFW 0,593 / 0,453 (3 personas) |
+|---|---|---|---|
+| Propios: RECONOCIDO correcto | 85,6 % | 89,5 % | 94,8 % |
+| Propios: RECONOCIDO como otra persona | 0,0 % | 0,0 % | 0,5 % |
+| Propios: DUDOSO / DESCONOCIDO | 9,3 % / 5,0 % | 7,3 % / 3,1 % | 1,5 % / 3,1 % |
+| **Compañero no registrado: RECONOCIDO (error grave)** | 5,8 % | **9,4 %** | **63,4 %** |
+| Compañero no registrado: DUDOSO / DESCONOCIDO | 76,3 % / 18,0 % | 79,6 % / 11,0 % | 32,5 % / 4,2 % |
+| Extraños de LFW: DESCONOCIDO / RECONOCIDO | 97,7 % / 0,0 % | 97,5 % / 0,0 % | 94,2 % / 0,3 % |
+
+- **Decisión: los umbrales finales de I2 son 0,70 (alto) y 0,50 (bajo).** Con tres personas se repite la conclusión: calibrar solo con LFW dejaría reconocer a 6 de cada 10
+  compañeros parecidos. Umbral único calibrado: 0,593 (FAR 0,25 % en LFW, FRR 5,2 %, 1 confusión: una foto de la sesión 4 de Aldana).
+- Las 10 fotos recientes de Aldana se reconocen todas (10/10, sin confusiones) con un registro hecho con fotos de 2022–2023: el perfil resiste el paso de los años.
+- Por persona (umbral único): Erick 42/42, Aldana 47/48 en las sesiones antiguas y 10/10 en la reciente, Luis 82/90 (rechazos: 6 de 77 con luz alta, 2 de 13 con luz baja).
+- **Límites:** las 4 sesiones de Erick son del mismo día, así que su resultado es optimista (fotos casi iguales entre sí); el «compañero no registrado» son solo tres personas que se
+  prestan parecido entre sí, por lo que el 9,4 % es orientativo y no una tasa firme. Los consentimientos son borradores de versiones distintas: unificar el texto definitivo (I1).
+
 ### 7. Placas en el dispositivo: ONNX int8
 
 Notebook `07_exportar_onnx_placas.ipynb`; detalle en `experiments/2026-10-15_placas_onnx/` (`metrics.json` y la ficha `modelo_placas.json`). El `.onnx` **no** va a git
@@ -219,12 +238,12 @@ y 316 fotos de extraños de LFW (2 por persona).
 
 ## Pendiente
 
-1. Las fotos de **Erick** (con consentimiento) y unas 10 **recientes de Aldana** para revalidar las zonas (sección 6). Ya no se pide a terceros: los extraños son datos públicos (LFW) y el «parecido» es el propio equipo.
+1. ~~Fotos de Erick y recientes de Aldana~~: recibidas y usadas en la revalidación de la sección 6 (16/10/2026). Mejorable: fotos de Erick en otros días y con otra luz, porque las 42 son del mismo día.
 2. **Probar otros métodos de comparación**: hoy se toma la foto registrada más parecida; probar el promedio de las k más parecidas o un registro con fotos de buena calidad.
 3. **Filtrar por calidad** las fotos de registro (muy borrosas o con reflejo) y mejorar la detección con poca luz (hoy se pierden 5 de 18).
-4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir) y revalidar con tres personas.
+4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Revalidadas con tres personas (sección 6). Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir).
 5. Texto de consentimiento (I1): existe como borrador (`docs/negocio/consentimiento-facial.md`); completar los campos entre corchetes y que los tres firmen la misma versión.
-6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** el ONNX solo detecta; EasyOCR no corre en el navegador, hay que decidir con Erick entre Tesseract.js (con lista de caracteres) y exportar el reconocedor a ONNX. Probar el int8 en `onnxruntime-web` y medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
+6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** el ONNX solo detecta; EasyOCR no corre en el navegador, hay que decidir con Erick entre Tesseract.js (con lista de caracteres) y exportar el reconocedor a ONNX. El int8 ya se probó en `onnxruntime-web` (WASM, en Node, `ml/web/`): 10 de 10 placas de vehículos detectadas, IoU 0,82–0,99 frente al motor nativo y ~240 ms por imagen en PC; falta medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
 
 ## Datos personales
 

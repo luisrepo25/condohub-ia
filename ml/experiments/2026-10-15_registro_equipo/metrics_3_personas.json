@@ -1,0 +1,223 @@
+{
+  "config": {
+    "nombre": "registro_equipo",
+    "semilla": 42,
+    "carpeta_propios": "datos/propios",
+    "lfw_min_fotos": 10,
+    "lfw_fotos_por_persona": 5,
+    "far_alto": 0.01,
+    "far_bajo": 0.1,
+    "umbrales_regla": {
+      "alto": 0.7,
+      "bajo": 0.5
+    }
+  },
+  "personas": {
+    "aldana": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-2"
+      },
+      "fotos_por_sesion": {
+        "sesion1_2022-03-27_a_2022-06-01": 13,
+        "sesion2_2022-06-02_a_2022-07-30": 13,
+        "sesion3_2022-07-30_a_2022-09-23": 12,
+        "sesion4_2022-09-24_a_2023-05-05": 12,
+        "sesion5_2026-10-15": 10
+      },
+      "rostro_detectado": {
+        "sesion1_2022-03-27_a_2022-06-01": "13/13",
+        "sesion2_2022-06-02_a_2022-07-30": "13/13",
+        "sesion3_2022-07-30_a_2022-09-23": "11/12",
+        "sesion4_2022-09-24_a_2023-05-05": "12/12",
+        "sesion5_2026-10-15": "10/10"
+      }
+    },
+    "erick": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-3"
+      },
+      "fotos_por_sesion": {
+        "sesion1_2026-10-15_a_2026-10-15": 11,
+        "sesion2_2026-10-15_a_2026-10-15": 11,
+        "sesion3_2026-10-15_a_2026-10-15": 10,
+        "sesion4_2026-10-15_a_2026-10-15": 10
+      },
+      "rostro_detectado": {
+        "sesion1_2026-10-15_a_2026-10-15": "11/11",
+        "sesion2_2026-10-15_a_2026-10-15": "11/11",
+        "sesion3_2026-10-15_a_2026-10-15": "10/10",
+        "sesion4_2026-10-15_a_2026-10-15": "10/10"
+      }
+    },
+    "luis": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-1"
+      },
+      "fotos_por_sesion": {
+        "Luz alta": 80,
+        "Luz baja": 18
+      },
+      "rostro_detectado": {
+        "Luz alta": "77/80",
+        "Luz baja": "13/18"
+      }
+    }
+  },
+  "fotos_usables": 191,
+  "extranos_lfw": {
+    "fotos": 790,
+    "personas": 158
+  },
+  "zonas": {
+    "regla_inicial": {
+      "alto": 0.7,
+      "bajo": 0.5,
+      "genuinos": {
+        "reconocido_correcto": 0.8952879581151832,
+        "reconocido_otra_persona": 0.0,
+        "dudoso_candidato_correcto": 0.06282722513089005,
+        "dudoso_candidato_otra_persona": 0.010471204188481676,
+        "desconocido": 0.031413612565445025,
+        "fotos": 191
+      },
+      "companeros_no_registrados": {
+        "RECONOCIDO": 0.09424083769633508,
+        "DUDOSO": 0.7958115183246073,
+        "DESCONOCIDO": 0.1099476439790576
+      },
+      "extranos_prueba": {
+        "RECONOCIDO": 0.0,
+        "DUDOSO": 0.02531645569620253,
+        "DESCONOCIDO": 0.9746835443037974
+      }
+    },
+    "calibrado_con_extranos": {
+      "alto": 0.593261182308197,
+      "bajo": 0.45315638184547424,
+      "genuinos": {
+        "reconocido_correcto": 0.9476439790575916,
+        "reconocido_otra_persona": 0.005235602094240838,
+        "dudoso_candidato_correcto": 0.010471204188481676,
+        "dudoso_candidato_otra_persona": 0.005235602094240838,
+        "desconocido": 0.031413612565445025,
+        "fotos": 191
+      },
+      "companeros_no_registrados": {
+        "RECONOCIDO": 0.6335078534031413,
+        "DUDOSO": 0.32460732984293195,
+        "DESCONOCIDO": 0.041884816753926704
+      },
+      "extranos_prueba": {
+        "RECONOCIDO": 0.002531645569620253,
+        "DUDOSO": 0.05569620253164557,
+        "DESCONOCIDO": 0.9417721518987342
+      }
+    }
+  },
+  "registro_umbral_unico": {
+    "umbral_calibrado_con_impostores_de_validacion": 0.593261182308197,
+    "far_maximo_pedido": 0.01,
+    "far_prueba": 0.002531645569620253,
+    "impostores": {
+      "validacion": 395,
+      "prueba": 395
+    },
+    "frr": 0.05235602094240843,
+    "confusiones": 1,
+    "por_sesion": [
+      {
+        "persona": "aldana",
+        "sesion": "sesion1_2022-03-27_a_2022-06-01",
+        "fotos": 13,
+        "reconocidas": 13,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion2_2022-06-02_a_2022-07-30",
+        "fotos": 13,
+        "reconocidas": 13,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion3_2022-07-30_a_2022-09-23",
+        "fotos": 11,
+        "reconocidas": 10,
+        "rechazadas": 1,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion4_2022-09-24_a_2023-05-05",
+        "fotos": 12,
+        "reconocidas": 11,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 1
+      },
+      {
+        "persona": "aldana",
+        "sesion": "sesion5_2026-10-15",
+        "fotos": 10,
+        "reconocidas": 10,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "erick",
+        "sesion": "sesion1_2026-10-15_a_2026-10-15",
+        "fotos": 11,
+        "reconocidas": 11,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "erick",
+        "sesion": "sesion2_2026-10-15_a_2026-10-15",
+        "fotos": 11,
+        "reconocidas": 11,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "erick",
+        "sesion": "sesion3_2026-10-15_a_2026-10-15",
+        "fotos": 10,
+        "reconocidas": 10,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "erick",
+        "sesion": "sesion4_2026-10-15_a_2026-10-15",
+        "fotos": 10,
+        "reconocidas": 10,
+        "rechazadas": 0,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "luis",
+        "sesion": "Luz alta",
+        "fotos": 77,
+        "reconocidas": 71,
+        "rechazadas": 6,
+        "confundidas_con_otra_persona": 0
+      },
+      {
+        "persona": "luis",
+        "sesion": "Luz baja",
+        "fotos": 13,
+        "reconocidas": 11,
+        "rechazadas": 2,
+        "confundidas_con_otra_persona": 0
+      }
+    ],
+    "sesiones_omitidas_por_ser_la_unica": []
+  },
+  "sesiones_omitidas": []
+}
