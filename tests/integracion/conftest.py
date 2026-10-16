@@ -6,7 +6,8 @@ from typing import Any
 
 import pytest
 
-COLECCIONES = ("perfiles_faciales", "desconocidos", "predicciones")
+COLECCIONES = ("perfiles_faciales", "desconocidos", "predicciones", "clusters_desconocidos", "outbox")
+RABBIT_URL = os.environ.get("RABBITMQ_URL_PRUEBAS", "amqp://condohub:condohub@localhost:5672/%2F")
 URI = os.environ.get("MONGO_URI_PRUEBAS", "mongodb://localhost:27017")
 BASE = os.environ.get("MONGO_DB_PRUEBAS", "ia_pruebas")
 # Almacén de objetos del compose (SeaweedFS); credenciales de desarrollo de infra/seaweedfs/s3.json
@@ -27,6 +28,38 @@ def s3() -> Any:
     except AlmacenNoDisponible:
         pytest.skip("No hay un almacén S3 (docker compose -f infra/docker-compose.yml up -d minio)")
     return cliente
+
+
+@pytest.fixture
+def cola_de_eventos() -> Iterator[Any]:
+    """Una cola temporal enlazada al exchange `condohub.events` para ver lo que publica el servicio."""
+    pika = pytest.importorskip("pika")
+    try:
+        conexion = pika.BlockingConnection(
+            pika.URLParameters(f"{RABBIT_URL}?connection_attempts=1&socket_timeout=2")
+        )
+        canal = conexion.channel()
+        cola = canal.queue_declare(queue="", exclusive=True).method.queue
+        canal.queue_bind(
+            exchange="condohub.events", queue=cola, routing_key="ia.VisitanteRecurrenteDetectado"
+        )
+    except Exception as e:  # noqa: BLE001 - cualquier fallo de conexión o de topología significa «no hay RabbitMQ listo»
+        pytest.skip(f"No hay un RabbitMQ con el exchange condohub.events ({type(e).__name__})")
+
+    def recibir(espera_s: float = 3.0) -> dict[str, Any] | None:
+        import json
+        import time
+
+        limite = time.time() + espera_s
+        while time.time() < limite:
+            metodo, _, cuerpo = canal.basic_get(queue=cola, auto_ack=True)
+            if metodo is not None:
+                return json.loads(cuerpo)  # type: ignore[no-any-return]
+            time.sleep(0.1)
+        return None
+
+    yield recibir
+    conexion.close()
 
 
 @pytest.fixture(scope="module")

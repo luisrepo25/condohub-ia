@@ -194,4 +194,23 @@ asegurar('reportes', {
 });
 ia.reportes.createIndex({ adminSub: 1, creadoEn: -1 });
 
+// ---------------------------------------------------------------------
+// outbox (S4): eventos de dominio pendientes de publicar en RabbitMQ (exchange condohub.events)
+// El cambio y el evento no comparten transacción (MongoDB sin réplica): la idempotencia sale de `eventId` único.
+// ---------------------------------------------------------------------
+asegurar('outbox', {
+  bsonType: 'object',
+  required: ['eventId', 'type', 'occurredAt', 'version', 'data', 'publicadoEn'],
+  properties: {
+    eventId: { bsonType: 'string', description: 'uuid del sobre; los consumidores descartan repetidos (S5)' },
+    type: { bsonType: 'string', pattern: '^[a-z]+\\.[A-Z][A-Za-z]+$', description: '<contexto>.<Evento> = routing key' },
+    occurredAt: { bsonType: 'date' },
+    version: { bsonType: ['int', 'long'], minimum: 1 },
+    data: { bsonType: 'object' },
+    publicadoEn: { bsonType: ['date', 'null'], description: 'null mientras no se haya publicado' },
+  },
+});
+ia.outbox.createIndex({ eventId: 1 }, { unique: true });
+ia.outbox.createIndex({ publicadoEn: 1, occurredAt: 1 });
+
 print('Base "ia" lista');

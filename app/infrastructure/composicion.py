@@ -3,7 +3,9 @@
 import importlib
 from datetime import UTC, datetime, timedelta
 
+from app.application.agrupar_desconocidos import AgruparDesconocidos
 from app.application.modelos import ObtenerModeloPlacas
+from app.application.publicar_outbox import PublicarOutbox
 from app.application.rostros import (
     AlmacenFotos,
     CasosRostros,
@@ -17,19 +19,23 @@ from app.application.rostros import (
     RetirarConsentimiento,
 )
 from app.config import Config
+from app.domain.agrupamiento import ParametrosAgrupamiento
 from app.domain.rostros import Embedding, ReconocedorFacial, Umbrales
 from app.infrastructure.catalogo_ficha import CatalogoFichaJson
+from app.infrastructure.dbscan import AgrupadorDbscan
 from app.infrastructure.memoria import (
     AlmacenFotosMemoria,
     RepositorioDesconocidosMemoria,
     RepositorioPerfilesMemoria,
     RepositorioPrediccionesMemoria,
 )
+from app.infrastructure.mongo.agrupamiento import LectorDesconocidosMongo, OutboxMongo, RegistroClustersMongo
 from app.infrastructure.mongo.repositorios import (
     RepositorioDesconocidosMongo,
     RepositorioPerfilesMongo,
     RepositorioPrediccionesMongo,
 )
+from app.infrastructure.rabbitmq import PublicadorRabbitMq
 from app.infrastructure.s3_cliente import AlmacenFotosS3, ClienteS3
 from app.infrastructure.s3_firmador import FirmadorS3
 
@@ -97,6 +103,33 @@ def construir_repositorios(
             RepositorioPrediccionesMongo(base["predicciones"]),
         )
     raise ValueError(f"PERSISTENCIA desconocida: {config.persistencia!r} (use «memoria» o «mongo»)")
+
+
+def construir_job_agrupamiento(config: Config) -> tuple[AgruparDesconocidos, PublicarOutbox]:
+    """El job de I4 necesita MongoDB (desconocidos, visitantes y outbox) y RabbitMQ (avisos)."""
+    if config.persistencia != "mongo":
+        raise ValueError("El job nocturno necesita PERSISTENCIA=mongo (los desconocidos viven en MongoDB)")
+    cliente = importlib.import_module("pymongo").MongoClient(config.mongo_uri, tz_aware=True)
+    base = cliente[config.mongo_db]
+    outbox = OutboxMongo(base["outbox"])
+    reloj = RelojSistema()
+    agrupar = AgruparDesconocidos(
+        LectorDesconocidosMongo(base["desconocidos"]),
+        RegistroClustersMongo(base["clusters_desconocidos"]),
+        outbox,
+        AgrupadorDbscan(),
+        reloj,
+        ParametrosAgrupamiento(
+            eps=config.dbscan_eps,
+            min_samples=config.dbscan_min_samples,
+            min_apariciones=config.i4_min_apariciones,
+            min_dias=config.i4_min_dias,
+        ),
+        retencion=timedelta(days=config.desconocidos_retencion_dias),
+    )
+    publicador = PublicadorRabbitMq(config.rabbitmq_url, config.rabbitmq_exchange)
+    publicar = PublicarOutbox(outbox, publicador, reloj)
+    return agrupar, publicar
 
 
 def construir_almacen_fotos(config: Config) -> AlmacenFotos:

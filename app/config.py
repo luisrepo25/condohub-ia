@@ -32,6 +32,14 @@ class Config:
     # Fotos de los rostros: "memoria" (se pierden al reiniciar) o "s3" (el almacén de objetos del proyecto)
     almacen_fotos: str = "memoria"
     s3_bucket_rostros: str = "rostros"
+    # I4: visitantes recurrentes (parámetros del job nocturno; valores de ml/README.md, notebook 05)
+    dbscan_eps: float = 0.30
+    dbscan_min_samples: int = 3
+    i4_min_apariciones: int = 3
+    i4_min_dias: int = 3
+    # Eventos de dominio (S4): exchange `condohub.events`; el usuario es el de desarrollo de infra/CLAUDE.md
+    rabbitmq_url: str = "amqp://condohub:condohub@localhost:5672/%2F"
+    rabbitmq_exchange: str = "condohub.events"
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -58,4 +66,10 @@ class Config:
             mongo_db=os.environ.get("MONGO_DB", "ia"),
             almacen_fotos=os.environ.get("ALMACEN_FOTOS", "memoria"),
             s3_bucket_rostros=os.environ.get("S3_BUCKET_ROSTROS", "rostros"),
+            dbscan_eps=float(os.environ.get("DBSCAN_EPS", "0.30")),
+            dbscan_min_samples=int(os.environ.get("DBSCAN_MIN_SAMPLES", "3")),
+            i4_min_apariciones=int(os.environ.get("I4_MIN_APARICIONES", "3")),
+            i4_min_dias=int(os.environ.get("I4_MIN_DIAS", "3")),
+            rabbitmq_url=os.environ.get("RABBITMQ_URL", "amqp://condohub:condohub@localhost:5672/%2F"),
+            rabbitmq_exchange=os.environ.get("RABBITMQ_EXCHANGE", "condohub.events"),
         )

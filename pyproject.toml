@@ -21,6 +21,7 @@ dev = [
     "pyyaml>=6",
     "ruff>=0.6",
     "mypy>=1.11",
+    "jsonschema>=4.20",
 ]
 
 # Modelo facial real del servicio (MODELO_FACIAL=facenet). `facenet-pytorch` se instala aparte con
@@ -34,6 +35,13 @@ inferencia = [
 # Persistencia en MongoDB (PERSISTENCIA=mongo), con el driver síncrono: los casos de uso del servicio son síncronos.
 persistencia = [
     "pymongo>=4.7",
+]
+
+# Job nocturno de I4: agrupamiento (DBSCAN) y publicación de avisos en RabbitMQ
+agrupamiento = [
+    "numpy>=1.26",
+    "scikit-learn>=1.5",
+    "pika>=1.3",
 ]
 
 ml = [
