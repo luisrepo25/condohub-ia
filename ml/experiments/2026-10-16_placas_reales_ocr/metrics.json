@@ -1,0 +1,104 @@
+{
+  "recortes": 10,
+  "tam_recortes_px": [
+    [
+      68,
+      36
+    ],
+    [
+      69,
+      37
+    ],
+    [
+      58,
+      36
+    ],
+    [
+      66,
+      40
+    ],
+    [
+      63,
+      54
+    ],
+    [
+      62,
+      33
+    ],
+    [
+      121,
+      65
+    ],
+    [
+      100,
+      54
+    ],
+    [
+      105,
+      56
+    ],
+    [
+      174,
+      105
+    ]
+  ],
+  "easyocr_crudo": {
+    "precision_por_caracter": 0.49275362318840576,
+    "placa_completa": 0.2,
+    "placas": 10.0
+  },
+  "easyocr_con_formato_A4": {
+    "precision_por_caracter": 0.6086956521739131,
+    "placa_completa": 0.6,
+    "placas": 10.0,
+    "confianzas": [
+      0.5996715930662422,
+      0.5453534574161337,
+      0.0,
+      0.928915602693773,
+      0.0,
+      0.45356640144657134,
+      0.0,
+      0.8284520753336551,
+      0.990055807341797,
+      0.0
+    ]
+  },
+  "tesseract": {
+    "x1_psm7": {
+      "precision_por_caracter": 0.26086956521739135,
+      "placa_completa": 0.0,
+      "placas": 10.0
+    },
+    "x1_psm6": {
+      "precision_por_caracter": 0.3913043478260869,
+      "placa_completa": 0.3,
+      "placas": 10.0
+    },
+    "x3_psm7": {
+      "precision_por_caracter": 0.34782608695652173,
+      "placa_completa": 0.1,
+      "placas": 10.0
+    },
+    "x3_psm6": {
+      "precision_por_caracter": 0.4057971014492754,
+      "placa_completa": 0.1,
+      "placas": 10.0
+    },
+    "x5_psm7": {
+      "precision_por_caracter": 0.3913043478260869,
+      "placa_completa": 0.1,
+      "placas": 10.0
+    },
+    "x5_psm6": {
+      "precision_por_caracter": 0.3913043478260869,
+      "placa_completa": 0.3,
+      "placas": 10.0
+    }
+  },
+  "tesseract_js_en_node": {
+    "mejor": "x5 psm 6",
+    "placas_exactas": "3/10",
+    "error_por_caracter": 0.551
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "franjas": {
+    "desde_0.0": {
+      "precision_por_caracter": 0.0,
+      "placa_completa": 0.0,
+      "placas": 10.0,
+      "texto_igual_torch_onnx": "10/10",
+      "dif_max_confianza": 3.683663227282974e-06,
+      "rechazadas_por_formato": 10
+    },
+    "desde_0.3": {
+      "precision_por_caracter": 0.4057971014492754,
+      "placa_completa": 0.4,
+      "placas": 10.0,
+      "texto_igual_torch_onnx": "10/10",
+      "dif_max_confianza": 6.483761026410129e-07,
+      "rechazadas_por_formato": 6
+    },
+    "desde_0.4": {
+      "precision_por_caracter": 0.33333333333333337,
+      "placa_completa": 0.3,
+      "placas": 10.0,
+      "texto_igual_torch_onnx": "10/10",
+      "dif_max_confianza": 1.3327528241013908e-06,
+      "rechazadas_por_formato": 6
+    },
+    "desde_0.5": {
+      "precision_por_caracter": 0.01449275362318836,
+      "placa_completa": 0.0,
+      "placas": 10.0,
+      "texto_igual_torch_onnx": "10/10",
+      "dif_max_confianza": 2.535294222005824e-06,
+      "rechazadas_por_formato": 9
+    }
+  },
+  "mejor_franja": "desde_0.3",
+  "rendimiento": {
+    "fp32": {
+      "MB": 15.14,
+      "ms_cpu_colab": 17.1
+    },
+    "int8_dinamico": {
+      "MB": 3.85,
+      "ms_cpu_colab": 41.7,
+      "placa_completa": 0.4,
+      "precision_por_caracter": 0.4057971014492754
+    }
+  },
+  "comparacion": {
+    "easyocr_completo_con_formato_A4": "6/10 (notebook 10)"
+  }
+}

@@ -210,6 +210,55 @@ que la sección 6. Como los puntajes de cada método tienen otra escala, se comp
   de 10,5 % a 11,0 / 12,0 / 13,6 %. Se pierde más por tener menos variedad de fotos que lo que se gana por calidad. **Se descarta el filtro de calidad en el registro.**
 - **Límites:** tres personas; las 4 sesiones de Erick son del mismo día; los «compañeros» son el propio equipo. Es una comparación orientativa, no una afinación de umbrales.
 
+### 6c. Lectura del texto sobre placas reales (16/10/2026)
+
+Notebook `10_placas_reales_ocr.ipynb` (métricas en `experiments/2026-10-16_placas_reales_ocr/`). **10 recortes de placas bolivianas reales** (capturas de vehículos, recortadas con el detector ONNX; 58 a 174 px de ancho, anotadas a mano por Luis;
+no se versionan: son vehículos de terceros). Es el único conjunto real con texto verdadero: el dataset de detección (433 imágenes) solo trae cajas, y hasta ahora la lectura se había medido con 300 placas
+sintéticas y una foto. Una de las 10 es una placa antigua de 3 dígitos que A4 no debe aceptar. Por privacidad (I6) ni las placas ni las lecturas se guardan en el repositorio: solo las métricas.
+
+| Lectura | Placas exactas | Precisión por carácter |
+|---|---|---|
+| Tesseract en Colab (mejor de 6 variantes de escala y modo) | 3/10 | 0,41 |
+| Tesseract.js en Node, WASM (mejor de 6 variantes) | 3/10 | 0,45 |
+| EasyOCR crudo | 2/10 | 0,49 |
+| **EasyOCR + formato de A4 (`elegir_placa`)** | **6/10** | **0,61** |
+
+- **Con el filtro de A4 no se aceptó ninguna lectura equivocada:** las 6 aceptadas son exactas (dos gracias a la corrección letra/dígito por posición: un `5` leído por `S` y un `8` repetido por `G`) y las 4 rechazadas
+  no se inventaron: la de formato antiguo (correcto), una placa dañada leída con varios errores, una sin lectura y una en la que el rótulo «BOLIVIA» quedó pegado a los caracteres. Sobre las 9 placas con formato A4: 6 de 9.
+- **La comparación con Tesseract no es del todo justa:** el filtro de formato y la corrección por posición no se le aplicaron. Lo firme es que Tesseract (en Python o en el navegador) no basta por sí solo.
+- **Confianza y A4 (0,85):** solo 2 de las 6 lecturas correctas llegan a 0,85 (0,93 y 0,99; otra queda en 0,83). Con ese umbral el sistema abriría solo 2 de 10 y el guardia decidiría el resto: seguro, pero muy conservador.
+  Las lecturas correctas de baja confianza (0,45 y 0,55) pasaron el formato. Con 10 placas no se puede concluir sobre el umbral: decisión del equipo con más datos.
+- **Mejora barata por probar:** leer solo la franja de caracteres (la mitad inferior de la placa) para dejar fuera el rótulo «BOLIVIA».
+- **Límites:** 10 placas, recortes pequeños de capturas de pantalla (en portería serán mayores). Orientativo, no una tasa.
+
+### 6d. El reconocedor de EasyOCR en ONNX, para leer la placa en el dispositivo (16/10/2026)
+
+Notebook `11_exportar_reconocedor_placas.ipynb`; lógica de lectura en `ml/src/lectura_placas.py`. EasyOCR no corre en el navegador, pero su **reconocedor** (VGG + BiLSTM + CTC, 3,8 M de parámetros) se exporta a ONNX y corre en
+`onnxruntime-web`; el detector de texto de EasyOCR (CRAFT) no hace falta porque ya hay detector de placas. Mismos 10 recortes reales de 6c.
+
+- **Exportación:** en CPU EasyOCR carga el reconocedor cuantizado (no exportable) y el `quantize=False` no lo evitó: se reconstruye el modelo en coma flotante (`easyocr.model.vgg_model.Model`) con los pesos de `english_g2.pth`, se reemplaza
+  `AdaptiveAvgPool2d((None, 1))` por un promedio del último eje (equivalente, con ancho dinámico) y se exporta con el exportador clásico (`dynamo=False`). Archivo: **15,1 MB** (fp32) o **3,85 MB** con cuantización dinámica int8.
+- **Paridad PyTorch ↔ ONNX:** el mismo texto en los 10 recortes y diferencia de confianza 0,0000.
+- **Velocidad (CPU de Colab, nativa):** 17 ms por lectura en fp32; el int8 dinámico baja el tamaño unas 4 veces **sin perder exactitud** (mismo resultado) pero tarda más (42 ms) en esa CPU; en el navegador (WASM) falta medirlo.
+- **Franja a leer:** pasar el recorte entero da 0/10 (el rótulo «BOLIVIA» va en la misma línea). Se lee desde varias alturas (`FRANJAS`: 0, 10, 20, 30, 40 y 50 % de la altura hasta abajo).
+
+| Estrategia sobre el recorte (reconocedor ONNX) | Exactas | Equivocadas aceptadas | Rechazadas |
+|---|---|---|---|
+| Una franja (30 %) + `elegir_placa` | 4/10 | 0 | 6 |
+| Una franja (30 %) + todas las ventanas con corrección | 4/10 | 2 | 4 |
+| Una franja (40 %) + todas las ventanas con corrección | 5/10 | 3 | 2 |
+| Varias franjas + todas las ventanas, sin votar | 6/10 | **2** | 2 |
+| **Varias franjas + votación (≥ 3 de 6)** | **4/10** | **0** | 6 |
+| *EasyOCR completo + formato (servidor, 6c)* | *6/10* | *0* | *4* |
+
+- **Las «ventanas con corrección» son peligrosas:** una lectura ruidosa contiene «placas» desfasadas un carácter que cumplen el formato y son falsas (2 de 10 aceptadas equivocadas). Por eso se exige que la misma placa aparezca en **al menos 3 franjas**.
+- **Decisión:** la PWA usa la votación (≥ 3): en el dispositivo se leen 4 de 10 placas con **cero errores aceptados**; las demás las decide el guardia (A4). Rechazar es barato, aceptar una placa falsa no.
+  El servidor (EasyOCR completo) llega a 6 de 10 con cero errores.
+- **Límites:** 10 placas de capturas pequeñas, y la estrategia se eligió sobre esas mismas placas: es una hipótesis que confirmar con más placas (idealmente de la cámara de portería), no una tasa.
+- **Portado a JavaScript** (`ml/web/lectura_placas.mjs`, probado con `probar_lectura.mjs` en Node con `onnxruntime-web`/WASM): preproceso equivalente a PIL (gris, recorte, bicúbica con antialias), decodificación CTC restringida
+  a dígitos y mayúsculas, y la votación. Frente a la referencia de Python: **el mismo texto en 60 de 60 lecturas** (6 franjas × 10 placas, diferencia máxima de confianza 0,0006) y la misma placa en 10 de 10 (4 exactas, 0 equivocadas).
+  Una placa completa (6 lecturas, con pre y posproceso) tarda unos 260 ms en WASM en la PC; falta medirla en un celular. Los pesos (`reconocedor_placas.onnx`, SHA-256 en `ficha_reconocedor.json`) no se versionan: van al almacén S3.
+
 ### 7. Placas en el dispositivo: ONNX int8
 
 Notebook `07_exportar_onnx_placas.ipynb`; detalle en `experiments/2026-10-15_placas_onnx/` (`metrics.json` y la ficha `modelo_placas.json`). El `.onnx` **no** va a git
@@ -266,7 +315,7 @@ y 316 fotos de extraños de LFW (2 por persona).
 3. ~~Filtrar por calidad las fotos de registro~~: probado en 6b y descartado (empeora). Queda mejorar la detección con poca luz (hoy se pierden 5 de 18) y, si hiciera falta, avisar al guardia cuando la foto de portería sea muy borrosa (la nitidez explica los puntajes bajos).
 4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Revalidadas con tres personas (sección 6). Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir).
 5. Texto de consentimiento (I1): existe como borrador (`docs/negocio/consentimiento-facial.md`); completar los campos entre corchetes y que los tres firmen la misma versión.
-6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** el ONNX solo detecta; EasyOCR no corre en el navegador, hay que decidir con Erick entre Tesseract.js (con lista de caracteres) y exportar el reconocedor a ONNX. El int8 ya se probó en `onnxruntime-web` (WASM, en Node, `ml/web/`): 10 de 10 placas de vehículos detectadas, IoU 0,82–0,99 frente al motor nativo y ~240 ms por imagen en PC; falta medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
+6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** resuelto en las secciones 6c y 6d (el reconocedor de EasyOCR exportado a ONNX + votación entre franjas, portado a JavaScript; Tesseract.js descartado). Falta publicarlo en el almacén S3 (`GET /modelos/...`), entregárselo a Erick y confirmar con más placas. El int8 ya se probó en `onnxruntime-web` (WASM, en Node, `ml/web/`): 10 de 10 placas de vehículos detectadas, IoU 0,82–0,99 frente al motor nativo y ~240 ms por imagen en PC; falta medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
 
 ## Datos personales
 
