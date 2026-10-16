@@ -191,6 +191,32 @@ del notebook 04 (70 placas), con el mismo posproceso (`ml/src/onnx_placas.py`, l
   (cx, cy, w, h en píxeles del tensor de 640 y confianza); confianza mínima 0,5 y NMS con IoU 0,45. Esto solo **detecta** la placa: leer el texto en el dispositivo
   (sin EasyOCR) sigue sin resolverse (ver «Pendiente»).
 
+### 8. El modelo facial real a través del servicio
+
+Notebook `08_probar_servicio_facial.ipynb`; detalle en `experiments/2026-10-15_servicio_facial/metrics.json`. Mide el adaptador real (`app/infrastructure/facenet.py`) conectado a los
+casos de uso `RegistrarRostro`, `IdentificarRostro` y `RetirarConsentimiento`, con los umbrales de la regla (0,70 y 0,50), las mismas fotos del equipo (Luis y Aldana)
+y 316 fotos de extraños de LFW (2 por persona).
+
+- **Paridad con el pipeline de `ml/`:** 27 fotos comparadas, similitud mínima 0,99999994 y mediana 1,0, sin discrepancias de detección. El servicio produce los mismos vectores
+  que los notebooks, así que lo medido en 02, 03 y 06 vale para el servicio.
+- **Resultados idénticos al notebook 06, foto por foto** (sobre las 139 fotos con rostro; el servicio evalúa 148 y 9 salen «sin rostro» por el detector):
+
+| Rostro → resultado | Servicio (148 fotos) | Notebook 06 (139 fotos) |
+|---|---|---|
+| Propios: RECONOCIDO correcto | 119 (80,4 %) | 119 (85,6 %) |
+| Propios: DUDOSO candidato correcto / otro | 12 / 1 | 12 / 1 |
+| Propios: DESCONOCIDO / sin rostro | 7 / 9 | 7 / — |
+| Propios reconocidos como OTRA persona | 0 | 0 |
+| Compañero no registrado: RECONOCIDO / DUDOSO / DESCONOCIDO | 8 / 106 / 25 | 5,8 % / 76,3 % / 18,0 % |
+| Extraños de LFW: DESCONOCIDO / DUDOSO / RECONOCIDO | 304 / 12 / 0 | (otra muestra: 97,7 % / 2,3 % / 0 %) |
+
+- **I1:** registrar → reconocer → retirar el consentimiento: las 49 fotos se borran al momento, el perfil queda sin embeddings y la misma foto pasa de RECONOCIDO a DESCONOCIDO.
+  El plazo informado es de 24 h. **I3:** se guardaron 304 desconocidos (los 12 DUDOSOS no). **I5:** 316 predicciones registradas, una por identificación.
+- La confusión de Aldana (sesión 4) que con el umbral único salía reconocida como Luis cae ahora en DUDOSO con candidato otro: es el caso para el que sirve la zona intermedia.
+- **Latencia del modelo (sin caché, 60 fotos, GPU T4):** mediana **80 ms**, p95 122 ms, máximo 160 ms por imagen nueva (decodificar la foto, MTCNN y FaceNet); medida en una celda aparte tras un calentamiento.
+  **No citar** el `latencia_ms` que trae el `metrics.json` de esta corrida (mediana 2 ms, p95 54 ms): se midió con la caché de vectores activa y solo refleja la comparación con los perfiles.
+  **No medida en CPU:** si el servicio se despliega sin GPU, hay que volver a medir (se espera bastante más).
+
 ## Pendiente
 
 1. Las fotos de **Erick** (con consentimiento) y unas 10 **recientes de Aldana** para revalidar las zonas (sección 6). Ya no se pide a terceros: los extraños son datos públicos (LFW) y el «parecido» es el propio equipo.

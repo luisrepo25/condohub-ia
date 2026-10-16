@@ -1,0 +1,105 @@
+{
+  "umbrales": {
+    "alto": 0.7,
+    "bajo": 0.5
+  },
+  "paridad_con_ml": {
+    "fotos": 27,
+    "minimo": 0.9999999402424762,
+    "mediana": 1.0000000228561534,
+    "discrepancias_de_deteccion": 0
+  },
+  "propios": {
+    "dudoso_candidato_correcto": 12,
+    "reconocido_correcto": 119,
+    "desconocido": 7,
+    "sin_rostro": 9,
+    "dudoso_candidato_otro": 1
+  },
+  "propios_por_sesion": [
+    {
+      "persona": "aldana",
+      "sesion": "sesion1_2022-03-27_a_2022-06-01",
+      "fotos": 13,
+      "dudoso_candidato_correcto": 1,
+      "reconocido_correcto": 12
+    },
+    {
+      "persona": "aldana",
+      "sesion": "sesion2_2022-06-02_a_2022-07-30",
+      "fotos": 13,
+      "reconocido_correcto": 13
+    },
+    {
+      "persona": "aldana",
+      "sesion": "sesion3_2022-07-30_a_2022-09-23",
+      "fotos": 12,
+      "desconocido": 1,
+      "reconocido_correcto": 10,
+      "sin_rostro": 1
+    },
+    {
+      "persona": "aldana",
+      "sesion": "sesion4_2022-09-24_a_2023-05-05",
+      "fotos": 12,
+      "reconocido_correcto": 11,
+      "dudoso_candidato_otro": 1
+    },
+    {
+      "persona": "luis",
+      "sesion": "Luz alta",
+      "fotos": 80,
+      "reconocido_correcto": 64,
+      "dudoso_candidato_correcto": 9,
+      "sin_rostro": 3,
+      "desconocido": 4
+    },
+    {
+      "persona": "luis",
+      "sesion": "Luz baja",
+      "fotos": 18,
+      "reconocido_correcto": 9,
+      "dudoso_candidato_correcto": 2,
+      "sin_rostro": 5,
+      "desconocido": 2
+    }
+  ],
+  "companeros_no_registrados": {
+    "dudoso_candidato_otro": 106,
+    "desconocido": 25,
+    "reconocido_otra_persona": 8,
+    "sin_rostro": 9
+  },
+  "extranos_lfw": {
+    "desconocido": 304,
+    "dudoso_candidato_otro": 12
+  },
+  "latencia_ms": {
+    "mediana": 2.3471800000152143,
+    "p95": 53.93800535000864,
+    "dispositivo": "GPU"
+  },
+  "ciclo_I1": {
+    "antes": "RECONOCIDO",
+    "despues": "DESCONOCIDO",
+    "fotos_borradas": 49
+  },
+  "personas": {
+    "aldana": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-2"
+      }
+    },
+    "luis": {
+      "consentimiento": {
+        "fecha": "2026-10-15",
+        "version": "borrador-1"
+      }
+    }
+  },
+  "modelo": {
+    "nombre": "facenet-vggface2",
+    "version": "1.0.0"
+  }
+}
