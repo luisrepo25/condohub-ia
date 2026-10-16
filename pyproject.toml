@@ -23,6 +23,14 @@ dev = [
     "mypy>=1.11",
 ]
 
+# Modelo facial real del servicio (MODELO_FACIAL=facenet). `facenet-pytorch` se instala aparte con
+# `pip install facenet-pytorch --no-deps`: fija versiones antiguas de torch que chocan con las actuales.
+inferencia = [
+    "torch>=2.2",
+    "torchvision>=0.17",
+    "pillow>=10",
+]
+
 ml = [
     "numpy>=1.26",
     "scikit-learn>=1.5",

@@ -21,6 +21,10 @@ class Config:
     umbral_dudoso: float = 0.50
     desconocidos_retencion_dias: int = 30
     retiro_plazo_horas: int = 24
+    # Modelo facial: "" = sin configurar (503) o "facenet" (MTCNN + FaceNet preentrenado; necesita PyTorch)
+    modelo_facial: str = ""
+    modelo_facial_version: str = "1.0.0"
+    modelo_facial_dispositivo: str = ""
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -39,4 +43,7 @@ class Config:
             umbral_dudoso=float(os.environ.get("UMBRAL_DUDOSO", "0.50")),
             desconocidos_retencion_dias=int(os.environ.get("DESCONOCIDOS_RETENCION_DIAS", "30")),
             retiro_plazo_horas=int(os.environ.get("RETIRO_PLAZO_HORAS", "24")),
+            modelo_facial=os.environ.get("MODELO_FACIAL", ""),
+            modelo_facial_version=os.environ.get("MODELO_FACIAL_VERSION", "1.0.0"),
+            modelo_facial_dispositivo=os.environ.get("MODELO_FACIAL_DISPOSITIVO", ""),
         )

@@ -53,9 +53,22 @@ def construir_obtener_modelo_placas(config: Config) -> ObtenerModeloPlacas:
     )
 
 
+def construir_modelo_facial(config: Config) -> ModeloFacial:
+    """`MODELO_FACIAL=facenet` conecta el modelo real (carga al primer uso); vacío deja el marcador (503)."""
+    if config.modelo_facial == "":
+        return ModeloFacialNoConfigurado()
+    if config.modelo_facial == "facenet":
+        from app.infrastructure.facenet import ModeloFacialFacenet
+
+        return ModeloFacialFacenet(
+            config.modelo_facial_dispositivo or None, version=config.modelo_facial_version
+        )
+    raise ValueError(f"MODELO_FACIAL desconocido: {config.modelo_facial!r} (use «facenet» o déjelo vacío)")
+
+
 def construir_casos_rostros(config: Config, modelo: ModeloFacial | None = None) -> CasosRostros:
     """Rostros con repositorios en memoria: sin persistencia hasta tener los adaptadores de MongoDB."""
-    modelo = modelo or ModeloFacialNoConfigurado()
+    modelo = modelo or construir_modelo_facial(config)
     perfiles = RepositorioPerfilesMemoria()
     fotos = AlmacenFotosMemoria()
     reloj = RelojSistema()

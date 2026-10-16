@@ -18,6 +18,7 @@ Se compara por similitud coseno contra los embeddings registrados; la regla I2 u
 | `03_finetuning_facial.ipynb` | Ajuste fino con triplet loss (semi-hard), comparación contra la base y repetición con 5 semillas |
 | `04_placas.ipynb` | Placas: YOLOv8n ajustado (mAP en prueba) + OCR medido con placas sintéticas de formato A4 (4 dígitos + 3 letras) |
 | `06_registro_equipo.ipynb` | Registra a las personas del equipo (una carpeta por persona; sirve para cualquier número) y mide las tres zonas de I2 contra extraños de LFW y «compañeros no registrados». Fotos preparadas con `python -m ml.src.preparar_fotos` |
+| `08_probar_servicio_facial.ipynb` | El modelo facial **real a través del servicio** (adaptador + casos de uso de `app/`): paridad con el pipeline de `ml/`, zonas de I2 con las fotos del equipo, ciclo de I1 (registrar, reconocer, retirar) y latencia. Necesita `servicio.zip` (carpetas `app/` y `ml/`) |
 | `05_dbscan_desconocidos.ipynb` | Visitantes recurrentes: DBSCAN (coseno) sobre desconocidos simulados con fotos de LFW; elige `eps` y mide las alertas de I4 |
 
 Lo que sale de cada corrida (`metrics.json` y similares) se copia a `experiments/<fecha>_<nombre>/` y **sí se versiona**.
