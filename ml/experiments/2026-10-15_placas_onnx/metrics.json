@@ -1,0 +1,107 @@
+{
+  "config": {
+    "nombre": "placas_onnx",
+    "semilla": 42,
+    "referencia": "ml/configs/placas_deteccion.yaml",
+    "onnx": {
+      "tamano_imagen": 640,
+      "opset": 12,
+      "calibracion_imagenes": 100,
+      "conf_minima": 0.5,
+      "iou_nms": 0.45,
+      "caida_maxima_ap50": 0.03,
+      "version": "1.0.0"
+    }
+  },
+  "modelos": {
+    "pytorch": {
+      "ap50": 0.9297166066640605,
+      "precision": 0.921875,
+      "recall": 0.8428571428571429,
+      "tp": 59,
+      "fp": 5,
+      "fn": 11,
+      "latencia_cpu_ms": null,
+      "tamano_mb": 6.49,
+      "coincidencia_con_pytorch": {
+        "coinciden": 64,
+        "solo_el_primero": 0,
+        "solo_el_segundo": 0,
+        "iou_medio": 1.0
+      }
+    },
+    "onnx_fp32": {
+      "ap50": 0.923001134913452,
+      "precision": 0.9354838709677419,
+      "recall": 0.8285714285714286,
+      "tp": 58,
+      "fp": 4,
+      "fn": 12,
+      "latencia_cpu_ms": 90.28460699994412,
+      "tamano_mb": 12.77,
+      "coincidencia_con_pytorch": {
+        "coinciden": 62,
+        "solo_el_primero": 2,
+        "solo_el_segundo": 0,
+        "iou_medio": 0.9808873937975976
+      }
+    },
+    "onnx_int8_u8u8": {
+      "ap50": 0.0,
+      "precision": null,
+      "recall": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 70,
+      "latencia_cpu_ms": 119.76053800003683,
+      "tamano_mb": 3.52,
+      "coincidencia_con_pytorch": {
+        "coinciden": 0,
+        "solo_el_primero": 64,
+        "solo_el_segundo": 0,
+        "iou_medio": null
+      }
+    },
+    "onnx_int8_u8s8": {
+      "ap50": 0.0,
+      "precision": null,
+      "recall": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 70,
+      "latencia_cpu_ms": 77.17143999991549,
+      "tamano_mb": 3.52,
+      "coincidencia_con_pytorch": {
+        "coinciden": 0,
+        "solo_el_primero": 64,
+        "solo_el_segundo": 0,
+        "iou_medio": null
+      }
+    },
+    "onnx_int8_u8s8_solo_conv": {
+      "ap50": 0.9034188721177747,
+      "precision": 0.9666666666666667,
+      "recall": 0.8285714285714286,
+      "tp": 58,
+      "fp": 2,
+      "fn": 12,
+      "latencia_cpu_ms": 98.35496599998805,
+      "tamano_mb": 3.52,
+      "coincidencia_con_pytorch": {
+        "coinciden": 59,
+        "solo_el_primero": 5,
+        "solo_el_segundo": 1,
+        "iou_medio": 0.908024661621805
+      }
+    }
+  },
+  "mejor_int8": "onnx_int8_u8s8_solo_conv",
+  "caida_ap50": 0.02629773454628581,
+  "decision": "ADOPTAR_INT8",
+  "particion": {
+    "train": 303,
+    "val": 65,
+    "test": 65
+  },
+  "imagenes_calibracion": 100
+}

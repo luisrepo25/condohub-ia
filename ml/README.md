@@ -167,6 +167,29 @@ Los consentimientos son los borradores (`borrador-1` y `borrador-2`): pendiente 
 - **Límites:** solo dos personas (el «compañero» es siempre el mismo parecido), 139 fotos propias, y las fotos de Aldana son de hace años y de WhatsApp. No afinar los umbrales con esta muestra;
   revalidar con Erick (tres personas) y con fotos recientes de Aldana.
 
+### 7. Placas en el dispositivo: ONNX int8
+
+Notebook `07_exportar_onnx_placas.ipynb`; detalle en `experiments/2026-10-15_placas_onnx/` (`metrics.json` y la ficha `modelo_placas.json`). El `.onnx` **no** va a git
+(I6): `D:\SW2\modelos\placas\2026-10-15_onnx\yolov8n_placas_int8.onnx` y, cuando haya infraestructura, el almacén S3 (`modelos/placas/1.0.0/`).
+El detector se exporta a ONNX y se **cuantiza de forma estática (QDQ)** con 100 imágenes de *entrenamiento*; se compara con PyTorch en las mismas 65 imágenes de prueba
+del notebook 04 (70 placas), con el mismo posproceso (`ml/src/onnx_placas.py`, la referencia en Python de lo que debe hacer la PWA).
+
+| Modelo | AP50 | Precisión | Recall | Tamaño | CPU (Colab, Python) |
+|---|---|---|---|---|---|
+| PyTorch | 0,930 | 0,922 | 0,843 | 6,5 MB | — |
+| ONNX fp32 | 0,923 | 0,935 | 0,829 | 12,8 MB | 90 ms |
+| ONNX int8, todo cuantizado (`u8u8`, `u8s8`) | **0,000** | — | 0,000 | 3,5 MB | 120 / 77 ms |
+| **ONNX int8, solo convoluciones (`u8s8_solo_conv`)** | **0,903** | 0,967 | 0,829 | **3,5 MB** | 98 ms |
+
+- **Cuantizar todo el grafo destruye la cabeza de detección** (AP 0,0); por eso se probaron tres variantes en vez de fiarse de una. Cuantizando solo las convoluciones la caída
+  es de 0,026 frente a PyTorch (límite fijado de antemano: 0,03) → se adopta. Con 70 placas de referencia la diferencia son unas 2 placas: equivalente al fp32 dentro de la incertidumbre.
+- La coincidencia con PyTorch en el punto de operación (confianza ≥ 0,5): el fp32 reproduce 62 de 64 detecciones y el int8, 59 (5 solo PyTorch, 1 solo ONNX).
+- **El int8 no es más rápido en este CPU** (98 ms frente a 90 ms): la ganancia es el **tamaño de descarga** (3,7 veces menos). La velocidad en un celular con `onnxruntime-web` solo se sabe midiéndola allí.
+- El modelo tiene nodos de cuantización (QDQ): la PWA debe comprobar que su versión de `onnxruntime-web` lo carga; si no, usar el fp32 (el notebook también lo exporta como respaldo).
+- **Contrato con la PWA** (`modelo_placas.json`): entrada `images` `[1, 3, 640, 640]` float (RGB, redimensionar sin deformar con relleno gris 114, dividir entre 255, NCHW); salida `output0` `[1, 5, 8400]`
+  (cx, cy, w, h en píxeles del tensor de 640 y confianza); confianza mínima 0,5 y NMS con IoU 0,45. Esto solo **detecta** la placa: leer el texto en el dispositivo
+  (sin EasyOCR) sigue sin resolverse (ver «Pendiente»).
+
 ## Pendiente
 
 1. Las fotos de **Erick** (con consentimiento) y unas 10 **recientes de Aldana** para revalidar las zonas (sección 6). Ya no se pide a terceros: los extraños son datos públicos (LFW) y el «parecido» es el propio equipo.
@@ -174,7 +197,7 @@ Los consentimientos son los borradores (`borrador-1` y `borrador-2`): pendiente 
 3. **Filtrar por calidad** las fotos de registro (muy borrosas o con reflejo) y mejorar la detección con poca luz (hoy se pierden 5 de 18).
 4. **Tres zonas** (reconocido / dudoso, decide el guardia / desconocido): escritas en la regla I2 con 0.70 y 0.50 y respaldadas por la sección 6. Falta avisar a Erick (Acceso debe mostrar el candidato en DUDOSO y no abrir) y revalidar con tres personas.
 5. Texto de consentimiento (I1): existe como borrador (`docs/negocio/consentimiento-facial.md`); completar los campos entre corchetes y que los tres firmen la misma versión.
-6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 y exportar a ONNX int8. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
+6. Placas: probar con más fotos bolivianas (y, si hace falta, ajustar el detector con ellas), decidir el umbral de A4 (0,85 es estricto para la confianza del OCR). **Leer el texto de la placa en el dispositivo:** el ONNX solo detecta; EasyOCR no corre en el navegador, hay que decidir con Erick entre Tesseract.js (con lista de caracteres) y exportar el reconocedor a ONNX. Probar el int8 en `onnxruntime-web` y medir la velocidad en un celular. Publicar el modelo en el almacén S3. Llevar DBSCAN al job nocturno del servicio (parámetros `eps` = 0,30 y `min_samples` = 3 configurables) y, si se consiguen, validarlo con fotos reales de portería.
 
 ## Datos personales
 

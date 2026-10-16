@@ -1,0 +1,12 @@
+# Exportación del detector de placas a ONNX int8 para la PWA del guardia (A4, O6) y comprobación contra PyTorch.
+nombre: placas_onnx
+semilla: 42
+referencia: ml/configs/placas_deteccion.yaml   # mismo dataset y misma partición (la prueba son las mismas 65 imágenes)
+onnx:
+  tamano_imagen: 640
+  opset: 12
+  calibracion_imagenes: 100     # solo de la partición de ENTRENAMIENTO (nunca de la de prueba)
+  conf_minima: 0.5              # punto de operación de la app; la confianza de A4 (0.85) se aplica a la lectura, no a la caja
+  iou_nms: 0.45
+  caida_maxima_ap50: 0.03       # el int8 solo se recomienda si pierde menos que esto frente a PyTorch
+  version: "1.0.0"

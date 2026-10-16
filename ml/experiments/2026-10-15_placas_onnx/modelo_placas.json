@@ -1,0 +1,35 @@
+{
+  "modelo": "yolov8n-placas",
+  "version": "1.0.0",
+  "formato": "onnx-int8",
+  "archivo": "yolov8n_placas_int8.onnx",
+  "sha256": "081f6e646ac660d4f4fe4107ea5631bdbc92d0d56f83d4de9709321fe6af692d",
+  "tamanoBytes": 3515616,
+  "opset": 12,
+  "entrada": {
+    "nombre": "images",
+    "forma": [
+      1,
+      3,
+      640,
+      640
+    ],
+    "tipo": "tensor(float)",
+    "preproceso": "RGB, redimensionar sin deformar a 640 (letterbox, relleno gris 114), dividir entre 255, NCHW"
+  },
+  "salida": {
+    "nombre": "output0",
+    "forma": [
+      1,
+      5,
+      8400
+    ],
+    "significado": "[1, 5, 8400]: por candidata cx, cy, w, h (píxeles del tensor de 640) y confianza"
+  },
+  "posproceso": {
+    "confianzaMinima": 0.5,
+    "iouNms": 0.45,
+    "referencia": "ml/src/onnx_placas.py (decodificar, nms)"
+  },
+  "decision": "ADOPTAR_INT8"
+}

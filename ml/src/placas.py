@@ -103,6 +103,26 @@ def voc_a_yolo(xml_texto: str, clase: int = 0) -> list[str]:
     return lineas
 
 
+def voc_a_cajas(xml_texto: str) -> list[tuple[float, float, float, float]]:
+    """Anotación Pascal VOC → cajas (x1, y1, x2, y2) en píxeles de la imagen original, con el mismo filtro que `voc_a_yolo`."""
+    raiz = ET.fromstring(xml_texto)
+    ancho = float(raiz.findtext("size/width", "0"))
+    alto = float(raiz.findtext("size/height", "0"))
+    if ancho <= 0 or alto <= 0:
+        raise ValueError("La anotación no trae el tamaño de la imagen")
+    cajas = []
+    for obj in raiz.findall("object"):
+        caja = obj.find("bndbox")
+        if caja is None:
+            continue
+        x1, y1, x2, y2 = (float(caja.findtext(k, "0")) for k in ("xmin", "ymin", "xmax", "ymax"))
+        x1, x2 = max(0.0, min(x1, ancho)), max(0.0, min(x2, ancho))
+        y1, y2 = max(0.0, min(y1, alto)), max(0.0, min(y2, alto))
+        if x2 > x1 and y2 > y1:
+            cajas.append((x1, y1, x2, y2))
+    return cajas
+
+
 def dividir_imagenes(
     nombres: Sequence[str], proporciones: tuple[float, float, float] = (0.7, 0.15, 0.15), semilla: int = 42
 ) -> dict[str, list[str]]:
