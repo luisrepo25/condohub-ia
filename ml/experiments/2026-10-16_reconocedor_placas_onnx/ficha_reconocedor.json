@@ -1,5 +1,6 @@
 {
   "modelo": "easyocr-reconocedor-placas",
+  "version": "1.0.0",
   "formato": "onnx-fp32",
   "archivo": "reconocedor_placas.onnx",
   "sha256": "31cd118ec9ddce4eafbccfe93b38dc5dbc3482bc325d8a061ef2c4e9e0280760",

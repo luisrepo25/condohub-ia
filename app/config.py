@@ -10,6 +10,7 @@ class Config:
     keycloak_jwks: str
     # Modelo de placas para la PWA del guardia (O6) y almacén de objetos (SeaweedFS con API S3; ver ADR 0002)
     modelo_placas_ficha: str = ""
+    modelo_lectura_ficha: str = ""  # ficha del reconocedor de texto de placas (notebook 11)
     s3_endpoint: str = "http://localhost:9000"
     s3_acceso: str = ""
     s3_secreto: str = ""
@@ -48,6 +49,7 @@ class Config:
             keycloak_issuer=issuer,
             keycloak_jwks=os.environ.get("KEYCLOAK_JWKS", f"{issuer}/protocol/openid-connect/certs"),
             modelo_placas_ficha=os.environ.get("MODELO_PLACAS_FICHA", ""),
+            modelo_lectura_ficha=os.environ.get("MODELO_LECTURA_FICHA", ""),
             s3_endpoint=os.environ.get("S3_ENDPOINT", "http://localhost:9000"),
             s3_acceso=os.environ.get("S3_ACCESS_KEY", os.environ.get("MINIO_ROOT_USER", "")),
             s3_secreto=os.environ.get("S3_SECRET_KEY", os.environ.get("MINIO_ROOT_PASSWORD", "")),
