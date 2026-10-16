@@ -1,0 +1,65 @@
+{
+  "config": {
+    "nombre": "placas_deteccion",
+    "semilla": 42,
+    "dataset": {
+      "kaggle": "andrewmvd/car-plate-detection",
+      "proporciones": [
+        0.7,
+        0.15,
+        0.15
+      ]
+    },
+    "entrenamiento": {
+      "modelo_inicial": "yolov8n.pt",
+      "epocas": 60,
+      "tamano_imagen": 640,
+      "lote": 16
+    },
+    "ocr": {
+      "idioma": [
+        "en"
+      ],
+      "permitidos": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+      "placas_sinteticas": 300
+    }
+  },
+  "deteccion_prueba": {
+    "map50": 0.9306257583517418,
+    "map50_95": 0.5192018150198001,
+    "precision": 0.9374978400940077,
+    "recall": 0.8571117544965685,
+    "imagenes_prueba": 65
+  },
+  "ocr_sintetico": {
+    "crudo": {
+      "precision_por_caracter": 0.9947619047619047,
+      "placa_completa": 0.9666666666666667,
+      "placas": 300.0
+    },
+    "con_extraccion": {
+      "precision_por_caracter": 0.9995238095238095,
+      "placa_completa": 0.9966666666666667,
+      "placas": 300.0
+    },
+    "con_extraccion_y_posicion": {
+      "precision_por_caracter": 0.9995238095238095,
+      "placa_completa": 0.9966666666666667,
+      "placas": 300.0
+    }
+  },
+  "particion": {
+    "train": 303,
+    "val": 65,
+    "test": 65
+  },
+  "prueba_foto_real": {
+    "placa_real": "2608ZYU",
+    "con_margen": {
+      "deteccion": 0.84,
+      "lectura": "2608ZYU",
+      "confianza_ocr": 0.76
+    },
+    "sin_margen_primer_plano": "cajas parciales; una lectura correcta (0.72) y otra rechazada por formato"
+  }
+}

@@ -1,0 +1,15 @@
+# Detección de placas (YOLOv8n ajustado) + lectura con OCR. A4.
+nombre: placas_deteccion
+semilla: 42
+dataset:
+  kaggle: andrewmvd/car-plate-detection   # 433 imágenes, una clase, anotaciones Pascal VOC, CC0
+  proporciones: [0.7, 0.15, 0.15]         # train / val / test, por imagen
+entrenamiento:
+  modelo_inicial: yolov8n.pt              # preentrenado en COCO (no trae la clase placa)
+  epocas: 60
+  tamano_imagen: 640
+  lote: 16
+ocr:
+  idioma: [en]
+  permitidos: ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+  placas_sinteticas: 300                  # texto conocido para medir la precisión por carácter
