@@ -29,6 +29,7 @@ ENDPOINTS = [
         "/rostros/identificar",
         frozenset({"GUARDIA", "ADMIN"}),
         {"files": IMAGEN},
+        implementado=True,
     ),
     Endpoint(
         "I1_registrar_rostro",
@@ -44,8 +45,15 @@ ENDPOINTS = [
             },
             "files": [("fotos", ("a.jpg", b"x", "image/jpeg"))],
         },
+        implementado=True,
     ),
-    Endpoint("I1_retirar_consentimiento", "DELETE", f"/rostros/{UUID_X}", frozenset({"ADMIN", "RESIDENTE"})),
+    Endpoint(
+        "I1_retirar_consentimiento",
+        "DELETE",
+        f"/rostros/{UUID_X}",
+        frozenset({"ADMIN", "RESIDENTE"}),
+        implementado=True,
+    ),
     Endpoint("A4_leer_placa", "POST", "/placas/leer", frozenset({"GUARDIA", "ADMIN"}), {"files": IMAGEN}),
     Endpoint(
         "A4_modelo_placas",

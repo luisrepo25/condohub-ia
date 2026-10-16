@@ -16,6 +16,11 @@ class Config:
     s3_bucket_modelos: str = "modelos"
     s3_region: str = "us-east-1"
     url_firmada_segundos: int = 900
+    # Rostros: parámetros de negocio de I1, I2 e I3 (valores iniciales de reglas-de-negocio.md)
+    umbral_reconocido: float = 0.70
+    umbral_dudoso: float = 0.50
+    desconocidos_retencion_dias: int = 30
+    retiro_plazo_horas: int = 24
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -30,4 +35,8 @@ class Config:
             s3_bucket_modelos=os.environ.get("S3_BUCKET_MODELOS", "modelos"),
             s3_region=os.environ.get("S3_REGION", "us-east-1"),
             url_firmada_segundos=int(os.environ.get("URL_FIRMADA_SEGUNDOS", "900")),
+            umbral_reconocido=float(os.environ.get("UMBRAL_RECONOCIDO", "0.70")),
+            umbral_dudoso=float(os.environ.get("UMBRAL_DUDOSO", "0.50")),
+            desconocidos_retencion_dias=int(os.environ.get("DESCONOCIDOS_RETENCION_DIAS", "30")),
+            retiro_plazo_horas=int(os.environ.get("RETIRO_PLAZO_HORAS", "24")),
         )
