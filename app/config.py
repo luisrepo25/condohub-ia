@@ -25,6 +25,10 @@ class Config:
     modelo_facial: str = ""
     modelo_facial_version: str = "1.0.0"
     modelo_facial_dispositivo: str = ""
+    # Persistencia: "memoria" (se pierde al reiniciar; desarrollo y pruebas) o "mongo"
+    persistencia: str = "memoria"
+    mongo_uri: str = "mongodb://localhost:27017"
+    mongo_db: str = "ia"
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -46,4 +50,7 @@ class Config:
             modelo_facial=os.environ.get("MODELO_FACIAL", ""),
             modelo_facial_version=os.environ.get("MODELO_FACIAL_VERSION", "1.0.0"),
             modelo_facial_dispositivo=os.environ.get("MODELO_FACIAL_DISPOSITIVO", ""),
+            persistencia=os.environ.get("PERSISTENCIA", "memoria"),
+            mongo_uri=os.environ.get("MONGO_URI", "mongodb://localhost:27017"),
+            mongo_db=os.environ.get("MONGO_DB", "ia"),
         )

@@ -31,6 +31,11 @@ inferencia = [
     "pillow>=10",
 ]
 
+# Persistencia en MongoDB (PERSISTENCIA=mongo), con el driver síncrono: los casos de uso del servicio son síncronos.
+persistencia = [
+    "pymongo>=4.7",
+]
+
 ml = [
     "numpy>=1.26",
     "scikit-learn>=1.5",
@@ -44,6 +49,7 @@ include = ["app*"]
 [tool.pytest.ini_options]
 testpaths = ["tests", "ml/tests"]
 pythonpath = ["."]
+markers = ["integracion: requiere un MongoDB real (se omite sola si no está disponible)"]
 
 [tool.ruff]
 line-length = 110

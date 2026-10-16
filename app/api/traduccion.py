@@ -29,3 +29,8 @@ def traduciendo_errores() -> Iterator[None]:
         raise ProblemaError(404, "No encontrado", str(e)) from e
     except (ModeloFacialNoDisponible, AlmacenNoDisponible) as e:
         raise ProblemaError(503, "Servicio no disponible", str(e)) from e
+    except Exception as e:
+        # Un fallo de MongoDB (servidor caído, tiempo agotado) es «no disponible», no un error del servicio
+        if type(e).__module__.startswith("pymongo"):
+            raise ProblemaError(503, "Base de datos no disponible", "No se pudo acceder a MongoDB") from e
+        raise

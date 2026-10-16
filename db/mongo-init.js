@@ -2,11 +2,12 @@
 // CondoHub · Servicio IA · MongoDB (base "ia")
 // Reglas: I1–I6, G4 (docs/negocio/reglas-de-negocio.md)
 // Uso: mongosh "mongodb://localhost:27017" db/mongo-init.js
+//      (otra base, p. ej. para pruebas: IA_DB=ia_pruebas mongosh ... db/mongo-init.js)
 // Idempotente: crea colecciones e índices solo si faltan; si existen, actualiza el validador.
 // Las imágenes y el audio NO se guardan aquí: van a MinIO y aquí solo su clave (I6).
 // =====================================================================
 
-const ia = db.getSiblingDB('ia');
+const ia = db.getSiblingDB(process.env.IA_DB || 'ia');
 
 function asegurar(nombre, schema) {
   const existe = ia.getCollectionNames().includes(nombre);
@@ -77,7 +78,7 @@ ia.perfiles_faciales.createIndex({ unidadCodigo: 1 });
 // ---------------------------------------------------------------------
 asegurar('desconocidos', {
   bsonType: 'object',
-  required: ['vector', 'modelo', 'capturadoEn', 'camara', 'expiraEn'],
+  required: ['vector', 'modelo', 'capturadoEn', 'expiraEn'],     // `camara` es opcional, como en ia.yaml
   properties: {
     vector: embedding512,
     modelo: modeloRef,
