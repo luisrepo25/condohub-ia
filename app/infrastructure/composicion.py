@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 from app.application.modelos import ObtenerModeloPlacas
 from app.application.rostros import (
+    AlmacenFotos,
     CasosRostros,
     IdentificarRostro,
     ModeloFacial,
@@ -29,6 +30,7 @@ from app.infrastructure.mongo.repositorios import (
     RepositorioPerfilesMongo,
     RepositorioPrediccionesMongo,
 )
+from app.infrastructure.s3_cliente import AlmacenFotosS3, ClienteS3
 from app.infrastructure.s3_firmador import FirmadorS3
 
 
@@ -97,11 +99,21 @@ def construir_repositorios(
     raise ValueError(f"PERSISTENCIA desconocida: {config.persistencia!r} (use «memoria» o «mongo»)")
 
 
+def construir_almacen_fotos(config: Config) -> AlmacenFotos:
+    """`ALMACEN_FOTOS=memoria` (se pierden al reiniciar) o `s3` (bucket privado del almacén de objetos)."""
+    if config.almacen_fotos == "memoria":
+        return AlmacenFotosMemoria()
+    if config.almacen_fotos == "s3":
+        cliente = ClienteS3(config.s3_endpoint, config.s3_acceso, config.s3_secreto, config.s3_region)
+        return AlmacenFotosS3(cliente, config.s3_bucket_rostros)
+    raise ValueError(f"ALMACEN_FOTOS desconocido: {config.almacen_fotos!r} (use «memoria» o «s3»)")
+
+
 def construir_casos_rostros(config: Config, modelo: ModeloFacial | None = None) -> CasosRostros:
-    """Rostros con el modelo y los repositorios que indique la configuración (las fotos, aún en memoria)."""
+    """Rostros con el modelo, los repositorios y el almacén de fotos que indique la configuración."""
     modelo = modelo or construir_modelo_facial(config)
     perfiles, desconocidos, predicciones = construir_repositorios(config)
-    fotos = AlmacenFotosMemoria()
+    fotos = construir_almacen_fotos(config)
     reloj = RelojSistema()
     return CasosRostros(
         registrar=RegistrarRostro(modelo, perfiles, fotos, reloj),

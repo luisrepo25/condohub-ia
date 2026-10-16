@@ -29,6 +29,9 @@ class Config:
     persistencia: str = "memoria"
     mongo_uri: str = "mongodb://localhost:27017"
     mongo_db: str = "ia"
+    # Fotos de los rostros: "memoria" (se pierden al reiniciar) o "s3" (el almacén de objetos del proyecto)
+    almacen_fotos: str = "memoria"
+    s3_bucket_rostros: str = "rostros"
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -53,4 +56,6 @@ class Config:
             persistencia=os.environ.get("PERSISTENCIA", "memoria"),
             mongo_uri=os.environ.get("MONGO_URI", "mongodb://localhost:27017"),
             mongo_db=os.environ.get("MONGO_DB", "ia"),
+            almacen_fotos=os.environ.get("ALMACEN_FOTOS", "memoria"),
+            s3_bucket_rostros=os.environ.get("S3_BUCKET_ROSTROS", "rostros"),
         )

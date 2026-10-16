@@ -1,4 +1,4 @@
-"""URL prefirmada de lectura con AWS Signature Version 4 (S3, MinIO y SeaweedFS). Solo biblioteca estándar."""
+"""URL prefirmada con AWS Signature Version 4 (S3, MinIO y SeaweedFS). Solo biblioteca estándar."""
 
 import hashlib
 import hmac
@@ -10,8 +10,9 @@ def _hmac(clave: bytes, mensaje: str) -> bytes:
     return hmac.new(clave, mensaje.encode("utf-8"), hashlib.sha256).digest()
 
 
-def url_firmada_get(
+def url_firmada(
     *,
+    metodo: str,
     esquema: str,
     host: str,
     ruta: str,
@@ -21,9 +22,10 @@ def url_firmada_get(
     ahora: datetime,
     vigencia_s: int,
 ) -> str:
-    """`GET` prefirmado de `ruta` (con barra inicial) en `host` (con puerto si no es el estándar).
+    """URL prefirmada para `metodo` (GET, PUT, DELETE...) sobre `ruta` (con barra inicial) en `host`.
 
-    El secreto no viaja en la URL.
+    `host` lleva el puerto si no es el estándar. El cuerpo no se firma (`UNSIGNED-PAYLOAD`)
+    y el secreto no viaja en la URL.
     """
     ahora = ahora.astimezone(UTC)
     fecha_hora, fecha = ahora.strftime("%Y%m%dT%H%M%SZ"), ahora.strftime("%Y%m%d")
@@ -37,10 +39,37 @@ def url_firmada_get(
     }
     consulta = "&".join(f"{quote(k, safe='~')}={quote(v, safe='~')}" for k, v in sorted(parametros.items()))
     ruta_codificada = quote(ruta, safe="/~")
-    canonica = "\n".join(["GET", ruta_codificada, consulta, f"host:{host}", "", "host", "UNSIGNED-PAYLOAD"])
+    canonica = "\n".join(
+        [metodo.upper(), ruta_codificada, consulta, f"host:{host}", "", "host", "UNSIGNED-PAYLOAD"]
+    )
     a_firmar = "\n".join(
         ["AWS4-HMAC-SHA256", fecha_hora, alcance, hashlib.sha256(canonica.encode("utf-8")).hexdigest()]
     )
     llave = _hmac(_hmac(_hmac(_hmac(f"AWS4{secreto}".encode(), fecha), region), "s3"), "aws4_request")
     firma = hmac.new(llave, a_firmar.encode("utf-8"), hashlib.sha256).hexdigest()
     return f"{esquema}://{host}{ruta_codificada}?{consulta}&X-Amz-Signature={firma}"
+
+
+def url_firmada_get(
+    *,
+    esquema: str,
+    host: str,
+    ruta: str,
+    acceso: str,
+    secreto: str,
+    region: str,
+    ahora: datetime,
+    vigencia_s: int,
+) -> str:
+    """`GET` prefirmado: es `url_firmada` con el método `GET` (lo usa la descarga del modelo de placas)."""
+    return url_firmada(
+        metodo="GET",
+        esquema=esquema,
+        host=host,
+        ruta=ruta,
+        acceso=acceso,
+        secreto=secreto,
+        region=region,
+        ahora=ahora,
+        vigencia_s=vigencia_s,
+    )
