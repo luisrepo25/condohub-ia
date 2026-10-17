@@ -67,9 +67,10 @@ ENDPOINTS = [
         "POST",
         "/reportes/voz",
         frozenset({"ADMIN"}),
-        {"files": {"audio": ("a.wav", b"x", "audio/wav")}},
+        {"files": {"audio": ("a.wav", b"", "audio/wav")}},   # audio vacío: da 400 antes de cargar Whisper
+        implementado=True,
     ),
-    Endpoint("G4_obtener_reporte", "GET", f"/reportes/{UUID_X}", frozenset({"ADMIN"})),
+    Endpoint("G4_obtener_reporte", "GET", f"/reportes/{UUID_X}", frozenset({"ADMIN"}), implementado=True),
 ]
 ROLES = ("ADMIN", "RESIDENTE", "GUARDIA")
 
@@ -101,7 +102,8 @@ def test_cada_rol_solo_usa_lo_que_le_toca(
 
 
 def test_los_501_se_identifican_como_no_implementado(client: TestClient, crear_token: CrearToken) -> None:
-    r = client.get(f"/reportes/{UUID_X}", headers={"Authorization": f"Bearer {crear_token('ADMIN')}"})
+    cabecera = {"Authorization": f"Bearer {crear_token('GUARDIA')}"}
+    r = client.post("/placas/leer", headers=cabecera, files=IMAGEN)
     assert r.json()["code"] == "NO_IMPLEMENTADO"
 
 

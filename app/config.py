@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
@@ -41,6 +41,20 @@ class Config:
     # Eventos de dominio (S4): exchange `condohub.events`; el usuario es el de desarrollo de infra/CLAUDE.md
     rabbitmq_url: str = "amqp://condohub:condohub@localhost:5672/%2F"
     rabbitmq_exchange: str = "condohub.events"
+    # G4: reportes por voz. Whisper local, LLM de Gemini (clave solo por entorno) y Gestión como fuente
+    gestion_graphql_url: str = "http://localhost:8081/graphql"
+    gemini_api_key: str = field(default="", repr=False)
+    llm_proveedor: str = "gemini"   # "gemini" o "groq"
+    llm_modelo: str = "gemini-flash-latest"
+    llm_url: str = "https://generativelanguage.googleapis.com"
+    groq_api_key: str = field(default="", repr=False)
+    groq_modelo: str = "openai/gpt-oss-20b"
+    groq_url: str = "https://api.groq.com/openai"
+    whisper_modelo: str = "base"
+    whisper_dispositivo: str = "cpu"
+    whisper_calculo: str = "int8"
+    almacen_reportes: str = "memoria"   # "memoria" o "s3"
+    s3_bucket_reportes: str = "reportes"
 
     @classmethod
     def desde_entorno(cls) -> "Config":
@@ -74,4 +88,17 @@ class Config:
             i4_min_dias=int(os.environ.get("I4_MIN_DIAS", "3")),
             rabbitmq_url=os.environ.get("RABBITMQ_URL", "amqp://condohub:condohub@localhost:5672/%2F"),
             rabbitmq_exchange=os.environ.get("RABBITMQ_EXCHANGE", "condohub.events"),
+            gestion_graphql_url=os.environ.get("GESTION_GRAPHQL_URL", "http://localhost:8081/graphql"),
+            gemini_api_key=os.environ.get("GEMINI_API_KEY", ""),
+            llm_proveedor=os.environ.get("LLM_PROVEEDOR", "gemini"),
+            llm_modelo=os.environ.get("LLM_MODELO", "gemini-flash-latest"),
+            groq_api_key=os.environ.get("GROQ_API_KEY", ""),
+            groq_modelo=os.environ.get("GROQ_MODELO", "openai/gpt-oss-20b"),
+            groq_url=os.environ.get("GROQ_URL", "https://api.groq.com/openai"),
+            llm_url=os.environ.get("LLM_URL", "https://generativelanguage.googleapis.com"),
+            whisper_modelo=os.environ.get("WHISPER_MODELO", "base"),
+            whisper_dispositivo=os.environ.get("WHISPER_DISPOSITIVO", "cpu"),
+            whisper_calculo=os.environ.get("WHISPER_CALCULO", "int8"),
+            almacen_reportes=os.environ.get("ALMACEN_REPORTES", "memoria"),
+            s3_bucket_reportes=os.environ.get("S3_BUCKET_REPORTES", "reportes"),
         )

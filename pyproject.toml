@@ -12,6 +12,8 @@ dependencies = [
     "uvicorn[standard]>=0.30",
     "python-multipart>=0.0.9",
     "pyjwt[crypto]>=2.9",
+    "httpx>=0.27",            # cliente de Gestión y del LLM (G4)
+    "graphql-core>=3.2",      # analiza las consultas del LLM: solo lectura (G4)
 ]
 
 [project.optional-dependencies]
@@ -22,6 +24,8 @@ dev = [
     "ruff>=0.6",
     "mypy>=1.11",
     "jsonschema>=4.20",
+    "openpyxl>=3.1",
+    "reportlab>=4",
 ]
 
 # Modelo facial real del servicio (MODELO_FACIAL=facenet). `facenet-pytorch` se instala aparte con
@@ -42,6 +46,15 @@ agrupamiento = [
     "numpy>=1.26",
     "scikit-learn>=1.5",
     "pika>=1.3",
+]
+
+# G4: reportes por voz (Whisper local, GraphQL, Excel y PDF). El LLM es la API de Gemini: sin dependencia, va por httpx.
+voz = [
+    "faster-whisper>=1.0",
+]
+reportes = [
+    "openpyxl>=3.1",
+    "reportlab>=4",
 ]
 
 ml = [
@@ -74,3 +87,7 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.11"
 strict = true
 files = ["app"]
+
+[[tool.mypy.overrides]]
+module = ["openpyxl.*", "reportlab.*", "faster_whisper.*"]
+ignore_missing_imports = true
