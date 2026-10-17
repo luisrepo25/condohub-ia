@@ -176,6 +176,7 @@ asegurar('reportes', {
   bsonType: 'object',
   required: ['adminSub', 'estado', 'formato', 'creadoEn'],
   properties: {
+    reporteId: { bsonType: 'string', description: 'uuid que expone la API (GET /reportes/{id})' },
     adminSub: { bsonType: 'string' },
     audioKey: { bsonType: 'string' },
     transcripcion: { bsonType: 'string' },
