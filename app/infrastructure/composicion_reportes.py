@@ -43,7 +43,7 @@ def _almacen(config: Config, reloj: RelojSistema) -> AlmacenReportes:
     if config.almacen_reportes == "s3":
         cliente = ClienteS3(config.s3_endpoint, config.s3_acceso, config.s3_secreto, config.s3_region)
         firmador = FirmadorS3(
-            config.s3_endpoint,
+            config.s3_endpoint_firma,
             config.s3_bucket_reportes,
             config.s3_acceso,
             config.s3_secreto,

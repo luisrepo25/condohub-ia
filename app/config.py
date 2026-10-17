@@ -12,6 +12,7 @@ class Config:
     modelo_placas_ficha: str = ""
     modelo_lectura_ficha: str = ""  # ficha del reconocedor de texto de placas (notebook 11)
     s3_endpoint: str = "http://localhost:9000"
+    s3_endpoint_publico: str = ""   # el que ve el cliente en las URLs firmadas; vacío = el mismo s3_endpoint
     s3_acceso: str = ""
     s3_secreto: str = ""
     s3_bucket_modelos: str = "modelos"
@@ -56,6 +57,11 @@ class Config:
     almacen_reportes: str = "memoria"   # "memoria" o "s3"
     s3_bucket_reportes: str = "reportes"
 
+    @property
+    def s3_endpoint_firma(self) -> str:
+        """Host con el que se firman las URLs del cliente (dentro de Docker, `minio:9000` no se alcanza)."""
+        return self.s3_endpoint_publico or self.s3_endpoint
+
     @classmethod
     def desde_entorno(cls) -> "Config":
         issuer = os.environ.get("KEYCLOAK_ISSUER", "http://localhost:8180/realms/condohub")
@@ -65,6 +71,7 @@ class Config:
             modelo_placas_ficha=os.environ.get("MODELO_PLACAS_FICHA", ""),
             modelo_lectura_ficha=os.environ.get("MODELO_LECTURA_FICHA", ""),
             s3_endpoint=os.environ.get("S3_ENDPOINT", "http://localhost:9000"),
+            s3_endpoint_publico=os.environ.get("S3_ENDPOINT_PUBLICO", ""),
             s3_acceso=os.environ.get("S3_ACCESS_KEY", os.environ.get("MINIO_ROOT_USER", "")),
             s3_secreto=os.environ.get("S3_SECRET_KEY", os.environ.get("MINIO_ROOT_PASSWORD", "")),
             s3_bucket_modelos=os.environ.get("S3_BUCKET_MODELOS", "modelos"),

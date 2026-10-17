@@ -59,7 +59,7 @@ def construir_obtener_modelo_placas(config: Config) -> ObtenerModeloPlacas:
     return ObtenerModeloPlacas(
         catalogo=CatalogoFichaJson(config.modelo_placas_ficha),
         firmador=FirmadorS3(
-            config.s3_endpoint,
+            config.s3_endpoint_firma,
             config.s3_bucket_modelos,
             config.s3_acceso,
             config.s3_secreto,
