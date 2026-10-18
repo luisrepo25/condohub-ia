@@ -154,10 +154,10 @@ asegurar('modelos', {
   properties: {
     nombre: { bsonType: 'string' },
     version: { bsonType: 'string' },
-    tarea: { enum: ['RECONOCIMIENTO_FACIAL', 'DETECCION_PLACAS', 'OCR_PLACAS', 'CLUSTERING_DESCONOCIDOS'] },
+    tarea: { enum: ['RECONOCIMIENTO_FACIAL', 'DETECCION_PLACAS', 'OCR_PLACAS', 'LECTURA_PLACAS_CNN', 'CLUSTERING_DESCONOCIDOS'] },
     tipoAprendizaje: { enum: ['SUPERVISADO', 'NO_SUPERVISADO'] },
     artefactoKey: { bsonType: 'string', description: 'modelos/<nombre>/<version>/ en MinIO' },
-    formato: { enum: ['PYTORCH', 'ONNX', 'ONNX_INT8', 'SKLEARN'] },
+    formato: { enum: ['PYTORCH', 'ONNX', 'ONNX_INT8', 'SKLEARN', 'KERAS', 'TFLITE'] },
     umbral: { bsonType: ['number', 'null'] },
     metricas: { bsonType: 'object', description: 'accuracy, far, frr, eer, auc, map50, silhouette...' },
     experimento: { bsonType: 'string', description: 'carpeta ml/experiments/<fecha>_<nombre>' },
