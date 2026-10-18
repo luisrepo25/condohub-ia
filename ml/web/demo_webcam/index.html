@@ -29,7 +29,7 @@
 </style>
 </head>
 <body>
-<h1>Prueba de lectura de placas con la webcam (CNN de TensorFlow en el navegador)</h1>
+<h1>Prueba de lectura de placas con la webcam (lector global + CNN de TensorFlow, en el navegador)</h1>
 <div class="fila">
   <div class="video">
     <video id="video" autoplay playsinline muted></video>
@@ -45,14 +45,16 @@
     <div style="margin-top:12px">
       <button id="confirmar" disabled>Confirmar ingreso</button>
       <button id="rechazar" class="sec" disabled>Rechazar</button>
+      <button id="guardar" class="sec" title="Descarga el cuadro actual de la cámara (para diagnóstico)">Guardar cuadro</button>
     </div>
-    <label for="registradas">Placas registradas (una por línea o separadas por coma)</label>
-    <input type="text" id="registradas" value="2602SIT">
-    <div class="suave">Regla A4: confianza ≥ 0,85 en 2 cuadros que coinciden y placa registrada → permitido. Una lectura a 1 carácter de una registrada se sugiere y decide el guardia.</div>
-    <table><thead><tr><th>Lectura</th><th>Conf.</th><th>Detector</th></tr></thead><tbody id="historial"></tbody></table>
+    <label for="registradas">Placas registradas (separadas por coma; cualquier país; se guardan en este navegador)</label>
+    <input type="text" id="registradas" value="2602SIT, 2534RIS">
+    <div class="suave" id="estadoRegistradas"></div>
+    <div class="suave">Regla A4: placa registrada con confianza ≥ 0,85 en 2 cuadros → permitido. Propuesta (pendiente de confirmar con el equipo): también se permite si el OCR lee la misma placa registrada en 3 de los últimos 8 cuadros. Con menos evidencia, o a 1 carácter, se sugiere y decide el guardia. La CNN solo es fiable con la placa de la demo.</div>
+    <table><thead><tr><th>CNN TensorFlow (conf.)</th><th>Lector global (conf.)</th><th>Detector</th></tr></thead><tbody id="historial"></tbody></table>
     <div class="registro" id="registro"></div>
   </div>
 </div>
-<script type="module" src="demo.mjs?v=6"></script>
+<script type="module" src="demo.mjs?v=14"></script>
 </body>
 </html>

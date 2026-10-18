@@ -349,6 +349,29 @@ del equipo, detectadas con el detector ONNX; 21 para entrenar y 7, de otro parac
 - **Prueba con la webcam de la laptop** (`ml/web/demo_webcam/`, pesos exportados al navegador con la BatchNorm plegada y comprobados contra Keras: diferencia máxima de probabilidad 2,4e-6): lectura en vivo `2602SIT`, 565 ms por cuadro
   (detector YOLOv8n ONNX con onnxruntime-web + CNN en JavaScript puro). La prueba se hizo con una foto de la placa en un celular, probablemente una de las fotos de entrenamiento: **es optimista**.
   Falta la prueba con la placa física y con placas no registradas.
+- **Prueba con una placa distinta (18/10/2026):** la CNN no la lee (`6652SIT`, confianza ≤ 0,2) y, peor, sus lecturas «a 1 carácter» de la placa de la demo producían una **sugerencia falsa** (`2602SIT`): memoriza esa placa. El detector sí la encuadró (0,82). El reconocedor ONNX de EasyOCR con votación leyó bien esa placa (`2534RIS`, confianza 0,48; con el mismo código de la página, en 0,4 s). Por eso la demo usa ahora **dos lectores**: la CNN solo cuenta si su lectura es exacta y con confianza ≥ 0,85, y el OCR es el lector general (si lee exactamente una placa registrada con menos de 0,85, queda como «sugerida: decide el guardia», según A4). Se eliminaron las sugerencias por cercanía basadas en la CNN. Con una captura real (2534RIS leída en 4 de 8 cuadros, confianza de 0,52 a 0,58, ninguna lectura equivocada) el umbral de un solo cuadro (0,85) no se alcanza nunca, así que se añadió la **propuesta de consenso**: la misma placa registrada en 3 de los últimos 8 cuadros permite el ingreso (decisión de Luis; pendiente de confirmar con el equipo y reflejada como propuesta en la regla A4). La decisión vive en `ml/web/demo_webcam/decision.mjs` y se prueba en Node con `probar_decision.mjs` (11 casos, entre ellos: una placa no registrada nunca se permite).
+
+### 6g. Lector global preentrenado: la solución para leer placas (18/10/2026)
+
+Tras varios días de intentar que nuestros lectores leyeran placas reales por la webcam (CNN propia: memoriza; EasyOCR: 6/10 y 2/28 en la placa de la demo), se probó el modelo preentrenado **`cct-xs-v2-global-model` de `fast-plate-ocr`** (paquete MIT; modelo de 3,2 MB entrenado con placas de muchos países, 3 a 10 caracteres, sin entrenar nada nuestro). Entrada RGB de 128 × 64; salida de 10 posiciones sobre 0-9, A-Z y relleno.
+
+| Conjunto (recortes del detector) | Lectura exacta |
+|---|---|
+| 10 placas bolivianas reales de otros vehículos (incluida la antigua `510MDA`) | **9 / 10** |
+| 28 recortes de la placa de la demo (`2602SIT`) | **27 / 28** |
+| Placa del Suzuki (`2534RIS`), una foto de 75 × 37 px | **1 / 1** |
+| **Total** | **37 / 39** |
+
+Frente a los demás lectores sobre las mismas 10 placas: EasyOCR con formato A4 6/10, reconocedor ONNX con votación 4/10, nuestra CNN 0/10 (solo reconoce `2602SIT` tras el ajuste fino).
+
+- **Los dos errores son de un solo carácter** (`1820FFC` → `1820EFC`, `2602SIT` → `2602S1T`).
+- **Su confianza no sirve para distinguir aciertos de errores:** las lecturas correctas tienen 0,94–1,00 y las dos incorrectas 0,98–1,00. La seguridad sale de **comparar con la lista de placas registradas** y de exigir varios cuadros (regla A4 con consenso), no del umbral de confianza.
+- **Sirve para placas de otros formatos** (extranjeras o antiguas): la lista de registradas de la demo acepta de 4 a 10 letras o dígitos.
+- **Preprocesamiento** (clave): recorte de la caja del detector con un 15 % de margen, deformado a 128 × 64, RGB. Con esa preparación leyó 37/39; con la de la librería, 20/28 en `2602SIT`.
+- **Demo con la webcam** (`ml/web/demo_webcam/`): detector YOLOv8n + lector global (principal) + CNN de TensorFlow (solo la placa de la demo). Probada en un **Chrome real con cámara simulada** (protocolo de depuración de Chrome): Suzuki → «PERMITIDO 2534RIS»; `2602SIT` → «PERMITIDO»; con `2534RIS` fuera de la lista → «NO REGISTRADA» (nunca permitido). 320 a 470 ms por cuadro con 4 hilos de WebAssembly (`servir.py` manda las cabeceras de aislamiento).
+- **Riesgo conocido:** si un visitante tuviera una placa que difiera en un carácter de una registrada, el lector podría confundirla en varios cuadros. Es poco probable (la lista es pequeña) pero no es cero.
+- **Obtener el modelo:** `pip install "fast-plate-ocr[onnx]"` y `LicensePlateRecognizer("cct-xs-v2-global-model")`; copiar `cct_xs_v2_global.onnx` a `services/ia/modelos/` (no va a git, I6). **Pendiente:** confirmar la licencia de los pesos en el repositorio del autor.
+- **Límites:** 39 recortes (10 de ellos de capturas pequeñas); las pruebas en navegador usan una cámara simulada con fotos, no una placa física.
 
 ## Pendiente
 

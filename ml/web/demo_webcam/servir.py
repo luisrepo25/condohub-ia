@@ -24,6 +24,9 @@ class Manejador(http.server.SimpleHTTPRequestHandler):
 
     def end_headers(self) -> None:
         self.send_header("Cache-Control", "no-store")
+        # Aislamiento de origen: permite SharedArrayBuffer y, con él, varios hilos de WebAssembly (onnxruntime-web ~2x más rápido).
+        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+        self.send_header("Cross-Origin-Embedder-Policy", "require-corp")
         super().end_headers()
 
 
