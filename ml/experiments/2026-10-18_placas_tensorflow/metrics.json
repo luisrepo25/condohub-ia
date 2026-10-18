@@ -1,0 +1,29 @@
+{
+  "notebook": "12_placas_tensorflow.ipynb",
+  "modelo": "CNN Keras: 3 bloques Conv-BN-ReLU-MaxPool + Dense(256) + salida unica 7x36 (softmax por posicion)",
+  "tensorflow": "2.21.0",
+  "semilla": 42,
+  "parametros": 2255516,
+  "entrenamiento": "40000 placas sinteticas A4 con aumentos (giro, desenfoque, luz, ruido, baja resolucion, recorte, contraste invertido); 40 epocas + 100 mas con la misma sesion (EarlyStopping y ReduceLROnPlateau)",
+  "sintetico_validacion_4000": { "precision_por_caracter": 0.9719, "placa_completa": 0.8593 },
+  "sintetico_300_sin_aumentos": { "precision_por_caracter": 0.9757, "placa_completa": 0.8633 },
+  "reales_10": {
+    "exactas": 0,
+    "total": 10,
+    "caracteres_acertados_aprox_en_las_9_A4": "22 de 63 (~35 %), conteo manual por posicion",
+    "umbral": 0.85,
+    "aceptadas": 0,
+    "equivocadas_aceptadas": 0,
+    "confianza_maxima": 0.19
+  },
+  "tflite": {
+    "fp32_mb": 9.03,
+    "int8_mb": 2.27,
+    "texto_igual_keras_fp32": "10/10",
+    "texto_igual_keras_int8": "6/10",
+    "latencia_int8_ms": 1.3,
+    "nota_latencia": "CPU de Colab; no medida en un celular"
+  },
+  "no_convertido": "TensorFlow.js: el paquete tensorflowjs choca con NumPy 2, Python 3.13 y packaging en Colab; la PWA usaria el .tflite con @tensorflow/tfjs-tflite",
+  "limites": "Entrenado solo con placas sinteticas; brecha sintetico/real. Los pesos no se versionan (I6)."
+}

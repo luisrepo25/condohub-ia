@@ -308,6 +308,48 @@ y 316 fotos de extraños de LFW (2 por persona).
   **No citar** el `latencia_ms` que trae el `metrics.json` de esta corrida (mediana 2 ms, p95 54 ms): se midió con la caché de vectores activa y solo refleja la comparación con los perfiles.
   **No medida en CPU:** si el servicio se despliega sin GPU, hay que volver a medir (se espera bastante más).
 
+### 6e. Red neuronal propia en TensorFlow/Keras para leer placas (18/10/2026)
+
+Notebook `12_placas_tensorflow.ipynb` (métricas en `experiments/2026-10-18_placas_tensorflow/`). Cubre el requisito de **Deep Learning con TensorFlow** sobre imágenes: una CNN entrenada desde cero
+(3 bloques Conv-BN-ReLU-MaxPool + capa densa, 2,26 M de parámetros) que lee los 7 caracteres de una placa A4 desde la franja inferior (gris, 32 × 128) con una salida 7 × 36 y softmax por posición;
+al decodificar se restringe a dígitos en las 4 primeras posiciones y letras en las 3 últimas. Entrenada con 40 000 placas **sintéticas** con aumentos, en Colab (T4).
+
+| Conjunto | Precisión por carácter | Placa completa |
+|---|---|---|
+| Validación sintética con aumentos (4000) | 97,2 % | 85,9 % |
+| 300 sintéticas sin aumentos (las del apartado 4) | 97,6 % | 86,3 % |
+| **10 placas reales** (las de 6c) | ~35 % en las 9 con formato A4 | **0 / 10** |
+
+- **Brecha sintético → real:** con placas dibujadas lee bien; con las 10 reales no acierta ninguna (los dígitos van mejor que las letras: `5280TIN` por `5280YIN`). Las confianzas son bajas (≤ 0,19), así que con A4 (0,85)
+  **no se acepta ninguna lectura equivocada**: decidiría el guardia. Con solo 10 placas reales no se puede cerrar la brecha entrenando; haría falta más fotos reales (p. ej. las de la placa de la demo, con permiso de su dueño, I6).
+- **EasyOCR + formato (6c, 6/10) sigue siendo el lector de placas.** La CNN es el componente de Deep Learning con TensorFlow y se declara con sus límites.
+- **TFLite:** fp32 9,03 MB (mismo texto que Keras en 10/10) e int8 2,27 MB (solo 6/10 iguales: la cuantización cambia lecturas; si se usa, el fp32). 1,3 ms por placa en la CPU de Colab (no medido en un celular).
+- **TensorFlow.js no se convirtió:** `tensorflowjs` choca con NumPy 2 / Python 3.13 en Colab. La PWA podría ejecutar el `.tflite` con `@tensorflow/tfjs-tflite`.
+- **Sin publicar en el servicio:** el contrato `ia.yaml` solo declara `onnx-*` y no hay endpoint para el TFLite; añadirlo requiere decisión del equipo. Los pesos (`.keras`, `.tflite`) van al Drive del equipo, no a git.
+
+### 6f. Ajuste fino con fotos reales de la placa de la demo y prueba con la webcam (18/10/2026)
+
+Notebook `13_ajuste_fino_placas_reales.ipynb` (métricas en `experiments/2026-10-18_placas_ajuste_fino/`). Parte de la CNN de 6e y la ajusta con **recortes reales** de la placa de la demo (`2602SIT`: 28 recortes de una ráfaga de 40 fotos
+del equipo, detectadas con el detector ONNX; 21 para entrenar y 7, de otro parachoques, para probar) mezclados con 20 000 placas sintéticas nuevas. Las fotos y los recortes no se versionan (I6).
+
+| | v1: solo la placa de la demo | v2: + 6 placas de otros textos |
+|---|---|---|
+| Fotos de prueba de la demo (otro parachoques) | **7/7**, confianza media 1,00 | **3/7**, confianza media 0,57 |
+| Placas de otros textos que lee como `2602SIT` | **2/10** como `2602SIT` (0,97 y 0,99) y una como `2202SIT` (0,93) | **0/4** reservadas |
+| Precisión por carácter en esas placas | 24,6 % (10 placas) | 7,4 % (4 reservadas, no entrenadas) |
+| Sintéticas (300) | 89,7 % de placa completa | 92,3 % |
+
+- **v1 memoriza la placa de la demo:** con el umbral de A4 (0,85) aceptaría placas ajenas como `2602SIT`. **v2 es la que se usa**: ninguna placa ajena supera el umbral; a cambio, de las fotos de la demo solo 3 de 7 lo superan solas
+  y el resto queda a 1 o 2 caracteres del texto correcto.
+- **No lee placas arbitrarias:** con 7 placas reales de entrenamiento no hay forma de generalizar (7,4 % por carácter en las reservadas). Lo que logra es no inventar una placa conocida y reconocer la de la demo.
+- **Lectura de la placa de la demo con otros lectores:** el reconocedor de EasyOCR con votación y formato A4 acierta **2/28** recortes (0 equivocadas aceptadas; lee la placa con caracteres de más, p. ej. `U2602SITL`),
+  y solo 7/28 quedan a 2 caracteres o menos de `2602SIT`. Exigir acuerdo con él rechazaría la placa de la demo.
+- **Comparación con la lista de placas registradas** (propuesta para Acceso y la app de guardia): lectura exacta registrada con confianza ≥ 0,85 permite; a 1 carácter de una registrada, la sugiere y decide el guardia; sin parecido, decide el guardia.
+  Se exigen 2 cuadros coincidentes con confianza ≥ 0,85 para aceptar.
+- **Prueba con la webcam de la laptop** (`ml/web/demo_webcam/`, pesos exportados al navegador con la BatchNorm plegada y comprobados contra Keras: diferencia máxima de probabilidad 2,4e-6): lectura en vivo `2602SIT`, 565 ms por cuadro
+  (detector YOLOv8n ONNX con onnxruntime-web + CNN en JavaScript puro). La prueba se hizo con una foto de la placa en un celular, probablemente una de las fotos de entrenamiento: **es optimista**.
+  Falta la prueba con la placa física y con placas no registradas.
+
 ## Pendiente
 
 1. ~~Fotos de Erick y recientes de Aldana~~: recibidas y usadas en la revalidación de la sección 6 (16/10/2026). Mejorable: fotos de Erick en otros días y con otra luz, porque las 42 son del mismo día.

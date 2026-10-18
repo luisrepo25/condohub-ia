@@ -1,0 +1,39 @@
+{
+  "notebook": "13_ajuste_fino_placas_reales.ipynb",
+  "base": "CNN del notebook 12",
+  "tensorflow": "2.21.0",
+  "semilla": 7,
+  "datos": {
+    "sinteticas_nuevas": 20000,
+    "reales_aumentados": 6000,
+    "recortes_reales_entrenamiento": 21,
+    "recortes_reales_prueba": 7
+  },
+  "antes": {
+    "sinteticas": {
+      "precision_por_caracter": 0.9757142857142858,
+      "placa_completa": 0.87,
+      "placas": 300.0
+    },
+    "demo_prueba": "0/7",
+    "demo_conf_media": 0.01460142619907856,
+    "reales_10_exactas": 0,
+    "reales_10_precision_caracter": 0.33333333333333337,
+    "reales_10_lecturas_2602SIT": 0
+  },
+  "despues": {
+    "sinteticas": {
+      "precision_por_caracter": 0.9809523809523809,
+      "placa_completa": 0.8966666666666666,
+      "placas": 300.0
+    },
+    "demo_prueba": "7/7",
+    "demo_conf_media": 0.9966633319854736,
+    "reales_10_exactas": 0,
+    "reales_10_precision_caracter": 0.24637681159420288,
+    "reales_10_lecturas_2602SIT": 2
+  },
+  "tflite_fp32_mb": 9.03,
+  "tflite_igual_keras_prueba": "7/7",
+  "limites": "Una sola placa fisica (2602SIT) en dos escenarios; las 10 placas de otros textos son la prueba de generalizacion."
+}

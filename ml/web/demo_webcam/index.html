@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prueba de placas con webcam</title>
+<style>
+  :root { --fondo:#101418; --panel:#1a2027; --texto:#e8edf2; --suave:#9aa7b4; --ok:#2fbf71; --aviso:#f0b429; --mal:#e5534b; --acento:#4c9ffe; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, sans-serif; background:var(--fondo); color:var(--texto); padding:16px; }
+  h1 { font-size:1.15rem; margin:0 0 12px; }
+  .fila { display:flex; gap:16px; flex-wrap:wrap; }
+  .video { position:relative; flex:1 1 520px; max-width:760px; }
+  video, canvas.caja { width:100%; border-radius:8px; display:block; }
+  video { background:#000; }
+  canvas.caja { position:absolute; inset:0; pointer-events:none; background:transparent; }
+  .panel { flex:1 1 300px; background:var(--panel); border-radius:8px; padding:14px; }
+  .estado { font-size:1.6rem; font-weight:700; margin:6px 0; }
+  .estado.ok { color:var(--ok); } .estado.aviso { color:var(--aviso); } .estado.mal { color:var(--mal); }
+  .placa { font-family: ui-monospace, monospace; font-size:2rem; letter-spacing:.12em; }
+  .suave { color:var(--suave); font-size:.85rem; }
+  button { background:var(--acento); color:#fff; border:0; padding:10px 16px; border-radius:6px; font-size:1rem; cursor:pointer; margin-right:8px; }
+  button.sec { background:#3a4450; } button:disabled { opacity:.4; cursor:default; }
+  label { display:block; margin:12px 0 4px; }
+  input[type=text] { width:100%; padding:8px; border-radius:6px; border:1px solid #3a4450; background:#0e1217; color:var(--texto); font-family:ui-monospace,monospace; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; margin-top:8px; }
+  td, th { padding:3px 6px; text-align:left; border-bottom:1px solid #2a323b; } th { color:var(--suave); font-weight:500; }
+  .registro { margin-top:10px; font-size:.85rem; }
+</style>
+</head>
+<body>
+<h1>Prueba de lectura de placas con la webcam (CNN de TensorFlow en el navegador)</h1>
+<div class="fila">
+  <div class="video">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="caja" class="caja"></canvas>
+  </div>
+  <div class="panel">
+    <div class="suave" id="carga">Cargando modelos…</div>
+    <label for="camara">Cámara</label>
+    <select id="camara" style="width:100%;padding:8px;border-radius:6px;background:#0e1217;color:#e8edf2;border:1px solid #3a4450"></select>
+    <div class="estado" id="estado">—</div>
+    <div class="placa" id="placa">&nbsp;</div>
+    <div class="suave" id="detalle"></div>
+    <div style="margin-top:12px">
+      <button id="confirmar" disabled>Confirmar ingreso</button>
+      <button id="rechazar" class="sec" disabled>Rechazar</button>
+    </div>
+    <label for="registradas">Placas registradas (una por línea o separadas por coma)</label>
+    <input type="text" id="registradas" value="2602SIT">
+    <div class="suave">Regla A4: confianza ≥ 0,85 en 2 cuadros que coinciden y placa registrada → permitido. Una lectura a 1 carácter de una registrada se sugiere y decide el guardia.</div>
+    <table><thead><tr><th>Lectura</th><th>Conf.</th><th>Detector</th></tr></thead><tbody id="historial"></tbody></table>
+    <div class="registro" id="registro"></div>
+  </div>
+</div>
+<script type="module" src="demo.mjs?v=6"></script>
+</body>
+</html>

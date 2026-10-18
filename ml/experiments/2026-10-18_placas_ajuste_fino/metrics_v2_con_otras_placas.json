@@ -1,0 +1,41 @@
+{
+  "notebook": "13_ajuste_fino_placas_reales.ipynb",
+  "base": "CNN del notebook 12",
+  "tensorflow": "2.21.0",
+  "semilla": 7,
+  "datos": {
+    "sinteticas_nuevas": 20000,
+    "reales_aumentados": 4000,
+    "entradas_reales_entrenamiento": 39,
+    "recortes_demo_prueba": 7,
+    "placas_otros_textos_entrenamiento": 6,
+    "placas_otros_textos_reservadas": 4
+  },
+  "antes": {
+    "sinteticas": {
+      "precision_por_caracter": 0.9757142857142858,
+      "placa_completa": 0.87,
+      "placas": 300.0
+    },
+    "demo_prueba": "0/7",
+    "demo_conf_media": 0.01460142619907856,
+    "reservadas_exactas": 0,
+    "reservadas_precision_caracter": 0.2962962962962963,
+    "reservadas_lecturas_2602SIT": 0
+  },
+  "despues": {
+    "sinteticas": {
+      "precision_por_caracter": 0.9847619047619047,
+      "placa_completa": 0.9233333333333333,
+      "placas": 300.0
+    },
+    "demo_prueba": "3/7",
+    "demo_conf_media": 0.5664859414100647,
+    "reservadas_exactas": 0,
+    "reservadas_precision_caracter": 0.07407407407407407,
+    "reservadas_lecturas_2602SIT": 0
+  },
+  "tflite_fp32_mb": 9.03,
+  "tflite_igual_keras_prueba": "7/7",
+  "limites": "Pocas placas reales (la de la demo en dos escenarios y 6 de otros textos); 4 placas reservadas son la prueba de generalizacion."
+}

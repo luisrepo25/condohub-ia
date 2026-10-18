@@ -10,3 +10,7 @@ __pycache__/
 ml/data/
 *.pt
 *.onnx
+*.keras
+*.tflite
+*.h5
+modelos/placas_cnn_*
