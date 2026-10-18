@@ -36,6 +36,13 @@ inferencia = [
     "pillow>=10",
 ]
 
+# Lectura de placas en el servidor (LECTOR_PLACAS=onnx): detector y lector global en ONNX, sin PyTorch
+placas = [
+    "onnxruntime>=1.18",
+    "numpy>=1.26",
+    "pillow>=10",
+]
+
 # Persistencia en MongoDB (PERSISTENCIA=mongo), con el driver síncrono: los casos de uso del servicio son síncronos.
 persistencia = [
     "pymongo>=4.7",

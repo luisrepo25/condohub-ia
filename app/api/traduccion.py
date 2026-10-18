@@ -4,6 +4,7 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 
 from app.api.problemas import ProblemaError
+from app.application.leer_placa import LectorPlacasNoDisponible
 from app.application.modelos import AlmacenNoDisponible
 from app.application.rostros import (
     ImagenInvalida,
@@ -27,7 +28,7 @@ def traduciendo_errores() -> Iterator[None]:
         raise ProblemaError(400, "Solicitud inválida", str(e)) from e
     except PerfilNoEncontrado as e:
         raise ProblemaError(404, "No encontrado", str(e)) from e
-    except (ModeloFacialNoDisponible, AlmacenNoDisponible) as e:
+    except (ModeloFacialNoDisponible, AlmacenNoDisponible, LectorPlacasNoDisponible) as e:
         raise ProblemaError(503, "Servicio no disponible", str(e)) from e
     except Exception as e:
         # Un fallo de MongoDB (servidor caído, tiempo agotado) es «no disponible», no un error del servicio

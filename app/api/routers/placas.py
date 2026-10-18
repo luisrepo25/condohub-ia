@@ -1,12 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 
-from app.api.dependencias import caso_obtener_modelo_placas
+from app.api.dependencias import caso_leer_placa, caso_obtener_modelo_placas
 from app.api.problemas import ProblemaError
-from app.api.routers.no_implementado import no_implementado
-from app.api.schemas import LecturaPlaca, ModeloPlacas
+from app.api.schemas import LecturaPlaca, ModeloPlacas, ResultadoPlaca
 from app.api.seguridad import requiere_rol
+from app.api.traduccion import traduciendo_errores
+from app.application.leer_placa import LeerPlaca
 from app.application.modelos import AlmacenNoDisponible, ModeloNoDisponible, ObtenerModeloPlacas
 from app.domain.roles import Rol
 
@@ -19,9 +20,22 @@ router = APIRouter(tags=["Placas"])
     operation_id="leerPlaca",
     dependencies=[Depends(requiere_rol(Rol.GUARDIA, Rol.ADMIN))],
 )
-def leer_placa(imagen: Annotated[UploadFile, File()]) -> None:
-    """Lee la placa. El umbral de 0.85 (A4) lo aplica Acceso, no este servicio."""
-    raise no_implementado("La lectura de placas")
+def leer_placa(
+    caso: Annotated[LeerPlaca, Depends(caso_leer_placa)],
+    imagen: Annotated[UploadFile, File()],
+    camara: Annotated[str | None, Form()] = None,
+) -> LecturaPlaca:
+    """Lee la placa (A4, I5). El umbral de 0.85 y la comparación con las registradas son de Acceso."""
+    with traduciendo_errores():
+        r = caso.ejecutar(imagen.file.read(), camara)
+    return LecturaPlaca(
+        resultado=ResultadoPlaca(r.resultado),
+        placa=r.placa,
+        confianza=r.confianza,
+        modelo=r.modelo,
+        version=r.version,
+        prediccionId=r.prediccion_id,
+    )
 
 
 @router.get(

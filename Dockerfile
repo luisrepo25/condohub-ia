@@ -15,8 +15,8 @@ RUN if [ "$INFERENCIA" = "true" ]; then \
 
 COPY pyproject.toml ./
 COPY app ./app
-RUN if [ "$INFERENCIA" = "true" ]; then EXTRAS="persistencia,agrupamiento,voz,reportes,inferencia"; \
-    else EXTRAS="persistencia,agrupamiento,voz,reportes"; fi \
+RUN if [ "$INFERENCIA" = "true" ]; then EXTRAS="persistencia,agrupamiento,voz,reportes,placas,inferencia"; \
+    else EXTRAS="persistencia,agrupamiento,voz,reportes,placas"; fi \
  && pip install ".[${EXTRAS}]" \
  && if [ "$INFERENCIA" = "true" ]; then pip install --no-deps facenet-pytorch; fi
 

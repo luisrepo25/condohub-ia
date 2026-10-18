@@ -54,7 +54,14 @@ ENDPOINTS = [
         frozenset({"ADMIN", "RESIDENTE"}),
         implementado=True,
     ),
-    Endpoint("A4_leer_placa", "POST", "/placas/leer", frozenset({"GUARDIA", "ADMIN"}), {"files": IMAGEN}),
+    Endpoint(
+        "A4_leer_placa",
+        "POST",
+        "/placas/leer",
+        frozenset({"GUARDIA", "ADMIN"}),
+        {"files": IMAGEN},
+        implementado=True,
+    ),
     Endpoint(
         "A4_modelo_placas",
         "GET",
@@ -101,10 +108,11 @@ def test_cada_rol_solo_usa_lo_que_le_toca(
         assert r.headers["content-type"].startswith("application/problem+json")
 
 
-def test_los_501_se_identifican_como_no_implementado(client: TestClient, crear_token: CrearToken) -> None:
+def test_sin_lector_de_placas_configurado_es_503(client: TestClient, crear_token: CrearToken) -> None:
     cabecera = {"Authorization": f"Bearer {crear_token('GUARDIA')}"}
     r = client.post("/placas/leer", headers=cabecera, files=IMAGEN)
-    assert r.json()["code"] == "NO_IMPLEMENTADO"
+    assert r.status_code == 503
+    assert r.headers["content-type"].startswith("application/problem+json")
 
 
 def test_solicitud_mal_formada_es_400_para_quien_tiene_permiso(

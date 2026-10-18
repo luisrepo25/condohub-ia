@@ -27,6 +27,11 @@ class Config:
     modelo_facial: str = ""
     modelo_facial_version: str = "1.0.0"
     modelo_facial_dispositivo: str = ""
+    # Lectura de placas (POST /placas/leer): "" = sin configurar (503) o "onnx" (detector + lector global)
+    lector_placas: str = ""
+    lector_placas_detector: str = "modelos/yolov8n_placas_int8.onnx"
+    lector_placas_modelo: str = "modelos/cct_xs_v2_global.onnx"
+    lector_placas_version: str = "1.0.0"
     # Persistencia: "memoria" (se pierde al reiniciar; desarrollo y pruebas) o "mongo"
     persistencia: str = "memoria"
     mongo_uri: str = "mongodb://localhost:27017"
@@ -84,6 +89,12 @@ class Config:
             modelo_facial=os.environ.get("MODELO_FACIAL", ""),
             modelo_facial_version=os.environ.get("MODELO_FACIAL_VERSION", "1.0.0"),
             modelo_facial_dispositivo=os.environ.get("MODELO_FACIAL_DISPOSITIVO", ""),
+            lector_placas=os.environ.get("LECTOR_PLACAS", ""),
+            lector_placas_detector=os.environ.get(
+                "LECTOR_PLACAS_DETECTOR", "modelos/yolov8n_placas_int8.onnx"
+            ),
+            lector_placas_modelo=os.environ.get("LECTOR_PLACAS_MODELO", "modelos/cct_xs_v2_global.onnx"),
+            lector_placas_version=os.environ.get("LECTOR_PLACAS_VERSION", "1.0.0"),
             persistencia=os.environ.get("PERSISTENCIA", "memoria"),
             mongo_uri=os.environ.get("MONGO_URI", "mongodb://localhost:27017"),
             mongo_db=os.environ.get("MONGO_DB", "ia"),
