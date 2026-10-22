@@ -44,6 +44,7 @@ class Config:
     dbscan_min_samples: int = 3
     i4_min_apariciones: int = 3
     i4_min_dias: int = 3
+    i4_reaviso_cada: int = 0
     # Eventos de dominio (S4): exchange `condohub.events`; el usuario es el de desarrollo de infra/CLAUDE.md
     rabbitmq_url: str = "amqp://condohub:condohub@localhost:5672/%2F"
     rabbitmq_exchange: str = "condohub.events"
@@ -104,6 +105,7 @@ class Config:
             dbscan_min_samples=int(os.environ.get("DBSCAN_MIN_SAMPLES", "3")),
             i4_min_apariciones=int(os.environ.get("I4_MIN_APARICIONES", "3")),
             i4_min_dias=int(os.environ.get("I4_MIN_DIAS", "3")),
+            i4_reaviso_cada=int(os.environ.get("I4_REAVISO_CADA", "0")),
             rabbitmq_url=os.environ.get("RABBITMQ_URL", "amqp://condohub:condohub@localhost:5672/%2F"),
             rabbitmq_exchange=os.environ.get("RABBITMQ_EXCHANGE", "condohub.events"),
             gestion_graphql_url=os.environ.get("GESTION_GRAPHQL_URL", "http://localhost:8081/graphql"),

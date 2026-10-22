@@ -124,6 +124,7 @@ def construir_job_agrupamiento(config: Config) -> tuple[AgruparDesconocidos, Pub
             min_samples=config.dbscan_min_samples,
             min_apariciones=config.i4_min_apariciones,
             min_dias=config.i4_min_dias,
+            reaviso_cada=config.i4_reaviso_cada,
         ),
         retencion=timedelta(days=config.desconocidos_retencion_dias),
     )

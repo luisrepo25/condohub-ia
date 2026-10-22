@@ -20,6 +20,9 @@ RUN if [ "$INFERENCIA" = "true" ]; then EXTRAS="persistencia,agrupamiento,voz,re
  && pip install ".[${EXTRAS}]" \
  && if [ "$INFERENCIA" = "true" ]; then pip install --no-deps facenet-pytorch; fi
 
+# facenet-pytorch se instaló sin dependencias y su import necesita `requests` y `tqdm` (sin ellos /rostros/* responde 503)
+RUN if [ "$INFERENCIA" = "true" ]; then pip install requests tqdm; fi
+
 # El modelo de Whisper y las fichas de los modelos se montan o se descargan fuera de la imagen
 ENV HF_HOME=/models/huggingface
 RUN useradd --system --uid 10001 condohub && mkdir -p /models && chown -R condohub /models

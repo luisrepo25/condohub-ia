@@ -21,12 +21,15 @@ class ParametrosAgrupamiento:
     min_samples: int = 3
     min_apariciones: int = 3
     min_dias: int = 3
+    reaviso_cada: int = 0  # 0 = avisar una sola vez por visitante; N = avisar de nuevo cada N apariciones más
 
     def __post_init__(self) -> None:
         if not 0 < self.eps <= 2:
             raise ValueError("eps es una distancia coseno: debe cumplir 0 < eps <= 2")
         if min(self.min_samples, self.min_apariciones, self.min_dias) < 1:
             raise ValueError("min_samples, min_apariciones y min_dias deben ser al menos 1")
+        if self.reaviso_cada < 0:
+            raise ValueError("reaviso_cada no puede ser negativo")
 
 
 @dataclass(frozen=True)

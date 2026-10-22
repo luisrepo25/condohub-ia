@@ -14,3 +14,20 @@ ml/data/
 *.tflite
 *.h5
 modelos/placas_cnn_*
+
+.env.*
+!.env.example
+.coverage
+htmlcov/
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/
+dist/
+build/
+
+# I6: no versionar fotos, audio ni reportes generados
+ml/web/**/*.jpg
+*.wav
+*.mp3

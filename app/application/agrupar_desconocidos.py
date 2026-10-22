@@ -92,8 +92,10 @@ class Outbox(Protocol):
         ...
 
 
-def evento_visitante_recurrente(cluster_id: str, grupo: GrupoRecurrente, ahora: datetime) -> EventoSaliente:
-    """El `eventId` sale del visitante, así que el mismo visitante nunca genera dos eventos distintos."""
+def evento_visitante_recurrente(
+    cluster_id: str, grupo: GrupoRecurrente, ahora: datetime, tramo: int = 0
+) -> EventoSaliente:
+    """El `eventId` sale del visitante y de su tramo de re-aviso: un reintento no duplica el aviso (S5)."""
     datos: dict[str, Any] = {
         "clusterId": cluster_id,
         "apariciones": grupo.apariciones,
@@ -103,7 +105,8 @@ def evento_visitante_recurrente(cluster_id: str, grupo: GrupoRecurrente, ahora: 
     }
     if grupo.camara is not None:
         datos["camara"] = grupo.camara
-    event_id = str(uuid5(NAMESPACE_URL, f"condohub/ia/VisitanteRecurrenteDetectado/{cluster_id}"))
+    sufijo = f"/{tramo}" if tramo else ""
+    event_id = str(uuid5(NAMESPACE_URL, f"condohub/ia/VisitanteRecurrenteDetectado/{cluster_id}{sufijo}"))
     return EventoSaliente(event_id, TIPO_EVENTO, ahora, datos)
 
 
@@ -125,6 +128,10 @@ class AgruparDesconocidos:
         self._agrupador, self._reloj, self._p, self._nuevo_id = agrupador, reloj, parametros, nuevo_id
         self._retencion = retencion
 
+    def _tramo(self, apariciones: int) -> int:
+        """Cada `reaviso_cada` apariciones empieza un tramo nuevo; con 0 no hay re-aviso (siempre tramo 0)."""
+        return apariciones // self._p.reaviso_cada if self._p.reaviso_cada else 0
+
     def ejecutar(self) -> ResultadoAgrupamiento:
         ahora = self._reloj.ahora()
         ejecucion_id = self._nuevo_id()
@@ -142,11 +149,14 @@ class AgruparDesconocidos:
             )  # el mismo visitante conserva su identidad
             previo = self._clusters.obtener(cluster_id)
             ya_avisado = previo is not None and previo.alertado
+            tramo = self._tramo(grupo.apariciones)
+            reavisar = ya_avisado and previo is not None and tramo > self._tramo(previo.apariciones)
             miembros = [a.id for a in grupo.miembros]
+            alertado_en = ahora if reavisar or not (previo and previo.alertado_en) else previo.alertado_en
 
             self._desconocidos.asignar_cluster(miembros, cluster_id)  # 1) identidad
-            if not ya_avisado:
-                self._outbox.agregar(evento_visitante_recurrente(cluster_id, grupo, ahora))  # 2) aviso
+            if not ya_avisado or reavisar:
+                self._outbox.agregar(evento_visitante_recurrente(cluster_id, grupo, ahora, tramo))  # 2) aviso
             self._clusters.guardar(  # 3) registro
                 ClusterRegistrado(
                     cluster_id=cluster_id,
@@ -156,12 +166,12 @@ class AgruparDesconocidos:
                     primera_vez=grupo.primera_vez,
                     ultima_vez=grupo.ultima_vez,
                     alertado=True,
-                    alertado_en=previo.alertado_en if previo and previo.alertado_en else ahora,
+                    alertado_en=alertado_en,
                     miembros=tuple(miembros),
                     eps=self._p.eps,
                     min_samples=self._p.min_samples,
                 )
             )
-            if not ya_avisado:
+            if not ya_avisado or reavisar:
                 alertas.append(cluster_id)
         return ResultadoAgrupamiento(len(apariciones), len(grupos), alertas)

@@ -3,7 +3,7 @@
     python -m app.jobs.agrupar_desconocidos
 
 Variables: `PERSISTENCIA=mongo`, `MONGO_URI`, `MONGO_DB`, `RABBITMQ_URL`, `DBSCAN_EPS`, `DBSCAN_MIN_SAMPLES`,
-`I4_MIN_APARICIONES`, `I4_MIN_DIAS`, `DESCONOCIDOS_RETENCION_DIAS`.
+`I4_MIN_APARICIONES`, `I4_MIN_DIAS`, `I4_REAVISO_CADA`, `DESCONOCIDOS_RETENCION_DIAS`.
 No imprime vectores ni fotos (I1, I6), solo conteos.
 Termina con código 1 si quedaron avisos sin publicar, para que el planificador lo señale;
 el siguiente intento los envía.
