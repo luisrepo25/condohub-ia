@@ -17,6 +17,7 @@ from app.domain.reportes import (
     Reporte,
     exigir_solo_lectura,
     filas_desde_respuesta,
+    vista_previa_desde,
 )
 from app.domain.roles import Solicitante
 
@@ -174,9 +175,11 @@ class GenerarArchivoReporte:
             datos = self._gestion.ejecutar(reporte.consulta_graphql, token)
             generador = self._generadores[reporte.formato]
             titulo = reporte.transcripcion or "Reporte"
-            archivo = generador.generar(titulo, filas_desde_respuesta(datos))
+            filas = filas_desde_respuesta(datos)
+            archivo = generador.generar(titulo, filas)
             clave = f"{reporte.id}.{generador.extension}"
             self._almacen.guardar(clave, archivo, generador.tipo)
+            reporte.registrar_vista_previa(vista_previa_desde(filas))
             reporte.completar(clave, self._reloj.ahora())
         except Exception as e:  # noqa: BLE001 - el reporte debe quedar FALLIDO con su motivo, cualquiera sea la causa
             reporte.fallar(f"{type(e).__name__}: {e}"[:300], self._reloj.ahora())

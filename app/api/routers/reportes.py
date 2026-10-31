@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from contextlib import contextmanager
+from dataclasses import asdict
 from typing import Annotated, Literal
 from uuid import UUID
 
@@ -9,6 +10,7 @@ from app.api.dependencias_reportes import casos_reportes, token_bruto
 from app.api.problemas import ProblemaError
 from app.api.schemas import EstadoReporte as EstadoApi
 from app.api.schemas import Reporte as ReporteApi
+from app.api.schemas import VistaPrevia
 from app.api.seguridad import requiere_rol
 from app.application.modelos import AlmacenNoDisponible
 from app.application.reportes import (
@@ -60,6 +62,7 @@ def _a_api(vista: ReporteConArchivo) -> ReporteApi:
         consultaGraphql=r.consulta_graphql,
         archivoUrl=vista.archivo_url,
         motivoFallo=r.motivo_fallo,
+        vistaPrevia=None if r.vista_previa is None else VistaPrevia(**asdict(r.vista_previa)),
     )
 
 

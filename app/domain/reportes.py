@@ -73,6 +73,27 @@ def filas_desde_respuesta(datos: dict[str, Any]) -> list[Fila]:
     return filas
 
 
+LIMITE_VISTA_PREVIA = 50
+
+
+@dataclass(frozen=True)
+class VistaPrevia:
+    """Primeras filas del resultado para verlas en pantalla (G4): alineadas con las columnas, en texto."""
+
+    columnas: list[str]
+    filas: list[list[str | None]]
+    total: int
+
+
+def vista_previa_desde(filas: list[Fila], limite: int = LIMITE_VISTA_PREVIA) -> VistaPrevia:
+    """Las claves aplanadas llevan puntos (`titular.nombre`): se guardan como columnas, no como campos."""
+    columnas: list[str] = []
+    for fila in filas:
+        columnas.extend(c for c in fila if c not in columnas)
+    muestra = [[None if f.get(c) is None else str(f[c]) for c in columnas] for f in filas[:limite]]
+    return VistaPrevia(columnas=columnas, filas=muestra, total=len(filas))
+
+
 @dataclass
 class Reporte:
     """Una instrucción de voz y todo lo que produjo: texto, consulta y archivo (G4)."""
@@ -87,6 +108,7 @@ class Reporte:
     archivo_key: str | None = None
     motivo_fallo: str | None = None
     terminado_en: datetime | None = None
+    vista_previa: VistaPrevia | None = None
 
     def registrar_instruccion(self, transcripcion: str, formato_elegido: FormatoReporte | None) -> None:
         self.transcripcion = transcripcion
@@ -94,6 +116,9 @@ class Reporte:
 
     def registrar_consulta(self, consulta: str) -> None:
         self.consulta_graphql = consulta
+
+    def registrar_vista_previa(self, vista: VistaPrevia) -> None:
+        self.vista_previa = vista
 
     def completar(self, archivo_key: str, ahora: datetime) -> None:
         self.archivo_key = archivo_key

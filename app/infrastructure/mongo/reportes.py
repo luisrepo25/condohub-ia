@@ -4,7 +4,7 @@ import re
 from typing import Any
 from uuid import UUID
 
-from app.domain.reportes import EstadoReporte, FormatoReporte, Reporte
+from app.domain.reportes import EstadoReporte, FormatoReporte, Reporte, VistaPrevia
 
 # El validador de `db/mongo-init.js` solo admite consultas que empiecen por `query` o `{`:
 # una rechazada por G4 (por ejemplo una mutation) no se guarda; el motivo del fallo dice qué se rechazó.
@@ -29,7 +29,14 @@ def reporte_a_documento(r: Reporte) -> dict[str, Any]:
         doc["motivoFallo"] = r.motivo_fallo
     if r.terminado_en is not None:
         doc["terminadoEn"] = r.terminado_en
+    if r.vista_previa is not None:
+        v = r.vista_previa
+        doc["vistaPrevia"] = {"columnas": v.columnas, "filas": v.filas, "total": v.total}
     return doc
+
+
+def _vista_previa(d: dict[str, Any] | None) -> VistaPrevia | None:
+    return None if d is None else VistaPrevia(columnas=d["columnas"], filas=d["filas"], total=d["total"])
 
 
 def documento_a_reporte(d: dict[str, Any]) -> Reporte:
@@ -44,6 +51,7 @@ def documento_a_reporte(d: dict[str, Any]) -> Reporte:
         archivo_key=d.get("archivoKey"),
         motivo_fallo=d.get("motivoFallo"),
         terminado_en=d.get("terminadoEn"),
+        vista_previa=_vista_previa(d.get("vistaPrevia")),
     )
 
 

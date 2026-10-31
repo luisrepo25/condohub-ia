@@ -191,6 +191,16 @@ asegurar('reportes', {
     motivoFallo: { bsonType: 'string' },
     creadoEn: { bsonType: 'date' },
     terminadoEn: { bsonType: 'date' },
+    vistaPrevia: {
+      bsonType: 'object',
+      required: ['columnas', 'filas', 'total'],
+      properties: {
+        columnas: { bsonType: 'array', items: { bsonType: 'string' } },
+        filas: { bsonType: 'array', items: { bsonType: 'array', items: { bsonType: ['string', 'null'] } } },
+        total: { bsonType: 'int', minimum: 0 },
+      },
+      description: 'G4: primeras filas del resultado para verlas en pantalla (máximo 50)',
+    },
   },
 });
 ia.reportes.createIndex({ adminSub: 1, creadoEn: -1 });

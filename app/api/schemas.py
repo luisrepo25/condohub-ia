@@ -70,6 +70,12 @@ class EstadoReporte(StrEnum):
     FALLIDO = "FALLIDO"
 
 
+class VistaPrevia(BaseModel):
+    columnas: list[str]
+    filas: list[list[str | None]]
+    total: int
+
+
 class Reporte(BaseModel):
     id: UUID
     estado: EstadoReporte
@@ -78,3 +84,4 @@ class Reporte(BaseModel):
     consultaGraphql: str | None = None  # noqa: N815
     archivoUrl: str | None = None  # noqa: N815
     motivoFallo: str | None = None  # noqa: N815
+    vistaPrevia: VistaPrevia | None = None  # noqa: N815
