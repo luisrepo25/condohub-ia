@@ -14,7 +14,9 @@ RUN if [ "$INFERENCIA" = "true" ]; then \
     fi
 
 COPY pyproject.toml ./
-COPY app ./app
+# Las dependencias se instalan con un paquete `app` vacío: esta capa (la más pesada) solo se reconstruye si cambia
+# pyproject.toml. El código real se copia después, así un cambio en app/ tarda segundos y no reinstala todo.
+RUN mkdir app && touch app/__init__.py
 RUN if [ "$INFERENCIA" = "true" ]; then EXTRAS="persistencia,agrupamiento,voz,reportes,placas,inferencia"; \
     else EXTRAS="persistencia,agrupamiento,voz,reportes,placas"; fi \
  && pip install ".[${EXTRAS}]" \
@@ -22,6 +24,8 @@ RUN if [ "$INFERENCIA" = "true" ]; then EXTRAS="persistencia,agrupamiento,voz,re
 
 # facenet-pytorch se instaló sin dependencias y su import necesita `requests` y `tqdm` (sin ellos /rostros/* responde 503)
 RUN if [ "$INFERENCIA" = "true" ]; then pip install requests tqdm; fi
+
+COPY app ./app
 
 # El modelo de Whisper y las fichas de los modelos se montan o se descargan fuera de la imagen
 ENV HF_HOME=/models/huggingface
