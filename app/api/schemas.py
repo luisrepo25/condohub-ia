@@ -2,9 +2,10 @@
 
 from datetime import datetime
 from enum import StrEnum
+from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, SerializerFunctionWrapHandler, model_serializer
 
 
 class Salud(BaseModel):
@@ -27,6 +28,14 @@ class IdentificacionRostro(BaseModel):
     modelo: str
     version: str
     prediccionId: str  # noqa: N815
+    nombre: str | None = None
+    unidadCodigo: str | None = None  # noqa: N815
+
+    @model_serializer(mode="wrap")
+    def _sin_datos_ausentes(self, siguiente: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """Sin nombre ni unidad (perfil registrado antes) la respuesta es la del contrato original."""
+        datos = siguiente(self)
+        return {k: v for k, v in datos.items() if v is not None or k not in ("nombre", "unidadCodigo")}
 
 
 class PerfilRegistrado(BaseModel):

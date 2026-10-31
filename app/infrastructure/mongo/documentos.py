@@ -22,7 +22,7 @@ def _modelo(nombre: str, version: str) -> dict[str, str]:
 
 
 def perfil_a_documento(perfil: PerfilFacial) -> dict[str, Any]:
-    return {
+    doc: dict[str, Any] = {
         "residenteId": str(perfil.residente_id),
         "residenteSub": perfil.residente_sub,
         "unidadId": str(perfil.unidad_id),
@@ -43,6 +43,12 @@ def perfil_a_documento(perfil: PerfilFacial) -> dict[str, Any]:
         ],
         "creadoEn": perfil.creado_en,
     }
+    # El validador exige texto: si no hay dato, el campo se omite en lugar de guardar null.
+    if perfil.nombre:
+        doc["nombre"] = perfil.nombre
+    if perfil.unidad_codigo:
+        doc["unidadCodigo"] = perfil.unidad_codigo
+    return doc
 
 
 def documento_a_perfil(doc: dict[str, Any]) -> PerfilFacial:
@@ -64,6 +70,8 @@ def documento_a_perfil(doc: dict[str, Any]) -> PerfilFacial:
         ],
         creado_en=doc["creadoEn"],
         retirado_en=c.get("retiradoEn"),
+        nombre=doc.get("nombre"),
+        unidad_codigo=doc.get("unidadCodigo"),
     )
 
 

@@ -84,6 +84,10 @@ class EmbeddingRegistrado:
     creado_en: datetime
 
 
+def _texto_o_none(valor: str | None) -> str | None:
+    return valor.strip() or None if valor else None
+
+
 class PerfilFacial:
     """Agregado: el perfil facial de un residente. Sin consentimiento vigente no hay embeddings (I1)."""
 
@@ -96,6 +100,8 @@ class PerfilFacial:
         embeddings: list[EmbeddingRegistrado],
         creado_en: datetime,
         retirado_en: datetime | None = None,
+        nombre: str | None = None,
+        unidad_codigo: str | None = None,
     ) -> None:
         self.residente_id = residente_id
         self.residente_sub = residente_sub
@@ -104,6 +110,14 @@ class PerfilFacial:
         self.creado_en = creado_en
         self._embeddings = list(embeddings)
         self._retirado_en = retirado_en
+        # Solo para mostrar al guardia quién es (A5): copia informativa, no regla; el dato vive en Gestión.
+        self.nombre = _texto_o_none(nombre)
+        self.unidad_codigo = _texto_o_none(unidad_codigo)
+
+    def actualizar_datos(self, nombre: str | None, unidad_codigo: str | None) -> None:
+        """Completa lo que se informe; lo que llega vacío no borra lo que ya había."""
+        self.nombre = _texto_o_none(nombre) or self.nombre
+        self.unidad_codigo = _texto_o_none(unidad_codigo) or self.unidad_codigo
 
     @classmethod
     def registrar(
@@ -114,6 +128,8 @@ class PerfilFacial:
         consentimiento: Consentimiento,
         embeddings: list[EmbeddingRegistrado],
         ahora: datetime,
+        nombre: str | None = None,
+        unidad_codigo: str | None = None,
     ) -> "PerfilFacial":
         if consentimiento.otorgado_en > ahora + _TOLERANCIA_RELOJ:
             raise ReglaViolada("I1", "La fecha del consentimiento no puede ser futura")
@@ -121,7 +137,10 @@ class PerfilFacial:
             raise ValueError("El perfil necesita el sub de Keycloak del residente")
         if not embeddings:
             raise ValueError("Un perfil nace con al menos un embedding")
-        return cls(residente_id, residente_sub, unidad_id, consentimiento, embeddings, ahora)
+        return cls(
+            residente_id, residente_sub, unidad_id, consentimiento, embeddings, ahora,
+            nombre=nombre, unidad_codigo=unidad_codigo,
+        )
 
     @property
     def embeddings(self) -> list[EmbeddingRegistrado]:

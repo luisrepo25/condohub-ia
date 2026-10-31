@@ -35,6 +35,8 @@ def identificar_rostro(
         modelo=r.modelo,
         version=r.version,
         prediccionId=r.prediccion_id,
+        nombre=r.nombre,
+        unidadCodigo=r.unidad_codigo,
     )
 
 
@@ -53,6 +55,8 @@ def registrar_rostro(
     fotos: Annotated[list[UploadFile], File()],
     consentimientoFecha: Annotated[datetime | None, Form()] = None,  # noqa: N803
     consentimientoVersion: Annotated[str | None, Form()] = None,  # noqa: N803
+    nombre: Annotated[str | None, Form(max_length=120)] = None,
+    unidadCodigo: Annotated[str | None, Form(max_length=10)] = None,  # noqa: N803
 ) -> PerfilRegistrado:
     """Solo con consentimiento explícito (I1): fecha con zona horaria y versión del texto aceptado.
 
@@ -67,6 +71,8 @@ def registrar_rostro(
             consentimientoFecha,
             consentimientoVersion,
             [f.file.read() for f in fotos],
+            nombre,
+            unidadCodigo,
         )
     return PerfilRegistrado(
         residenteId=r.residente_id, embeddings=r.embeddings, modelo=r.modelo, version=r.version

@@ -96,6 +96,8 @@ class ResultadoIdentificacion:
     modelo: str
     version: str
     prediccion_id: str
+    nombre: str | None = None          # del candidato (RECONOCIDO o DUDOSO): quién es, para el guardia
+    unidad_codigo: str | None = None
 
 
 @dataclass(frozen=True)
@@ -122,6 +124,8 @@ class RegistrarRostro:
         consentimiento_fecha: datetime | None,
         consentimiento_version: str | None,
         fotos: list[bytes],
+        nombre: str | None = None,
+        unidad_codigo: str | None = None,
     ) -> PerfilRegistrado:
         ahora = self._reloj.ahora()
         if consentimiento_fecha is None or consentimiento_version is None:
@@ -145,9 +149,10 @@ class RegistrarRostro:
         if perfil is not None and perfil.vigente:
             # TODO(regla): ¿registrar de nuevo a un residente vigente amplía su perfil (hoy) o lo reemplaza?
             perfil.agregar(nuevos)
+            perfil.actualizar_datos(nombre, unidad_codigo)
         else:
             perfil = PerfilFacial.registrar(
-                residente_id, residente_sub, unidad_id, consentimiento, nuevos, ahora
+                residente_id, residente_sub, unidad_id, consentimiento, nuevos, ahora, nombre, unidad_codigo
             )
         self._perfiles.guardar(perfil)
         return PerfilRegistrado(
@@ -205,8 +210,10 @@ class IdentificarRostro:
                 fecha=ahora,
             )
         )
+        candidato = self._perfiles.por_residente(residente_id) if residente_id else None
         return ResultadoIdentificacion(
-            resultado, residente_id, confianza, self._modelo.nombre, self._modelo.version, prediccion_id
+            resultado, residente_id, confianza, self._modelo.nombre, self._modelo.version, prediccion_id,
+            candidato.nombre if candidato else None, candidato.unidad_codigo if candidato else None,
         )
 
 
