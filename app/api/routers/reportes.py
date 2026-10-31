@@ -69,20 +69,30 @@ def _a_api(vista: ReporteConArchivo) -> ReporteApi:
 @router.post("/voz", status_code=202, response_model=ReporteApi, operation_id="crearReportePorVoz")
 def crear_reporte_por_voz(
     segundo_plano: BackgroundTasks,
-    audio: Annotated[UploadFile, File()],
     admin: Annotated[Solicitante, Depends(requiere_rol(Rol.ADMIN))],
     token: Annotated[str, Depends(token_bruto)],
     casos: Annotated[CasosReportes, Depends(casos_reportes)],
+    audio: Annotated[UploadFile | None, File()] = None,
+    instruccion: Annotated[str | None, Form()] = None,
     formato: Annotated[Literal["EXCEL", "PDF"] | None, Form()] = None,
 ) -> ReporteApi:
-    """Audio → Whisper → consulta GraphQL de solo lectura → Excel/PDF (G4). Solo ADMIN.
+    """Audio (o instrucción escrita) → consulta GraphQL de solo lectura → Excel/PDF (G4). Solo ADMIN.
+
+    Se envía `audio` o `instruccion`, uno solo: con `instruccion` se omite Whisper y el resto es igual.
 
     La transcripción, la consulta y la comprobación de solo lectura son síncronas (una mutation da 422 `G4`);
     el archivo se genera en segundo plano y se consulta con `GET /reportes/{id}`.
     """
     with _traduciendo_errores():
         elegido = FormatoReporte(formato) if formato else None
-        reporte = casos.iniciar.iniciar(admin, audio.file.read(), token, elegido)
+        sin_texto = instruccion is not None and casos.iniciar_texto is None
+        if (audio is None) == (instruccion is None) or sin_texto:
+            raise AudioInvalido("Envía un audio o una instrucción escrita, uno de los dos")
+        if instruccion is not None and casos.iniciar_texto is not None:
+            reporte = casos.iniciar_texto.iniciar(admin, instruccion.encode(), token, elegido)
+        else:
+            assert audio is not None
+            reporte = casos.iniciar.iniciar(admin, audio.file.read(), token, elegido)
     segundo_plano.add_task(casos.generar.generar, reporte.id, token)
     return _a_api(ReporteConArchivo(reporte, None))
 

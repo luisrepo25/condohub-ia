@@ -12,6 +12,7 @@ from app.application.reportes import (
     ObtenerReporte,
     RepositorioReportes,
 )
+from app.application.reportes_texto import TranscriptorDeTexto
 from app.config import Config
 from app.domain.reportes import FormatoReporte
 from app.infrastructure.composicion import RelojSistema
@@ -68,6 +69,9 @@ def construir_casos_reportes(config: Config) -> CasosReportes:
     gestion = GestionHttp(config.gestion_graphql_url)
     almacen = _almacen(config, reloj)
     return CasosReportes(
+        iniciar_texto=IniciarReporte(
+            repositorio, TranscriptorDeTexto(), _constructor(config), AnalizadorGraphqlCore(), gestion, reloj
+        ),
         iniciar=IniciarReporte(
             repositorio,
             TranscriptorWhisper(

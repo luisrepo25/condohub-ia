@@ -215,3 +215,4 @@ class CasosReportes:
     iniciar: IniciarReporte
     generar: GenerarArchivoReporte
     obtener: ObtenerReporte
+    iniciar_texto: IniciarReporte | None = None  # la orden escrita (sin Whisper); ver reportes_texto.py
