@@ -3,6 +3,7 @@
 import io
 
 from app.domain.reportes import Fila
+from app.infrastructure.saneado_celdas import fijar_como_texto, texto_pdf
 
 
 def _columnas(filas: list[Fila]) -> list[str]:
@@ -32,6 +33,8 @@ class GeneradorExcel:
             celda.font = Font(bold=True)
         for fila in filas:
             hoja.append([fila.get(c) for c in columnas])
+            for celda in hoja[hoja.max_row]:
+                fijar_como_texto(celda)
         for i, columna in enumerate(columnas, start=1):
             ancho = max([len(columna)] + [len(str(f.get(columna, ""))) for f in filas]) + 2
             hoja.column_dimensions[hoja.cell(row=1, column=i).column_letter].width = min(ancho, 60)
@@ -53,15 +56,15 @@ class GeneradorPdf:
         estilos = getSampleStyleSheet()
         salida = io.BytesIO()
         documento = SimpleDocTemplate(salida, pagesize=landscape(A4), title=titulo[:250], author="CondoHub")
-        contenido: list[object] = [Paragraph(titulo, estilos["Title"]), Spacer(1, 12)]
+        contenido: list[object] = [Paragraph(texto_pdf(titulo), estilos["Title"]), Spacer(1, 12)]
         columnas = _columnas(filas)
         if not filas:
             contenido.append(Paragraph("Sin resultados.", estilos["Normal"]))
         else:
             celda = estilos["BodyText"].clone("celda", fontSize=7, leading=9)
-            datos = [[Paragraph(str(c), celda) for c in columnas]]
+            datos = [[Paragraph(texto_pdf(c), celda) for c in columnas]]
             for f in filas:
-                datos.append([Paragraph("" if f.get(c) is None else str(f.get(c)), celda) for c in columnas])
+                datos.append([Paragraph(texto_pdf(f.get(c)), celda) for c in columnas])
             tabla = Table(datos, repeatRows=1)
             tabla.setStyle(
                 TableStyle(
