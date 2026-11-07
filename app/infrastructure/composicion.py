@@ -138,7 +138,8 @@ def construir_almacen_fotos(config: Config) -> AlmacenFotos:
     if config.almacen_fotos == "memoria":
         return AlmacenFotosMemoria()
     if config.almacen_fotos == "s3":
-        cliente = ClienteS3(config.s3_endpoint, config.s3_acceso, config.s3_secreto, config.s3_region)
+        endpoint, acceso, secreto = config.almacen_rostros   # el de las fotos o, si no hay, el general
+        cliente = ClienteS3(endpoint, acceso, secreto, config.s3_region)
         return AlmacenFotosS3(cliente, config.s3_bucket_rostros)
     raise ValueError(f"ALMACEN_FOTOS desconocido: {config.almacen_fotos!r} (use «memoria» o «s3»)")
 

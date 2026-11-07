@@ -16,6 +16,11 @@ class Config:
     s3_acceso: str = ""
     s3_secreto: str = ""
     s3_bucket_modelos: str = "modelos"
+    # Almacén propio de las fotos de rostros (I1); vacío = el mismo almacén general.
+    # Permite tener reportes y modelos en AWS y las fotos en la VM.
+    s3_rostros_endpoint: str = ""
+    s3_rostros_acceso: str = ""
+    s3_rostros_secreto: str = ""
     s3_region: str = "us-east-1"
     url_firmada_segundos: int = 900
     # Rostros: parámetros de negocio de I1, I2 e I3 (valores iniciales de reglas-de-negocio.md)
@@ -64,6 +69,15 @@ class Config:
     s3_bucket_reportes: str = "reportes"
 
     @property
+    def almacen_rostros(self) -> tuple[str, str, str]:
+        """Endpoint y claves de las fotos de rostros: los propios si se configuraron; si no, los generales."""
+        return (
+            self.s3_rostros_endpoint or self.s3_endpoint,
+            self.s3_rostros_acceso or self.s3_acceso,
+            self.s3_rostros_secreto or self.s3_secreto,
+        )
+
+    @property
     def s3_endpoint_firma(self) -> str:
         """Host con el que se firman las URLs del cliente (dentro de Docker, `minio:9000` no se alcanza)."""
         return self.s3_endpoint_publico or self.s3_endpoint
@@ -81,6 +95,9 @@ class Config:
             s3_acceso=os.environ.get("S3_ACCESS_KEY", os.environ.get("MINIO_ROOT_USER", "")),
             s3_secreto=os.environ.get("S3_SECRET_KEY", os.environ.get("MINIO_ROOT_PASSWORD", "")),
             s3_bucket_modelos=os.environ.get("S3_BUCKET_MODELOS", "modelos"),
+            s3_rostros_endpoint=os.environ.get("S3_ROSTROS_ENDPOINT", ""),
+            s3_rostros_acceso=os.environ.get("S3_ROSTROS_ACCESS_KEY", ""),
+            s3_rostros_secreto=os.environ.get("S3_ROSTROS_SECRET_KEY", ""),
             s3_region=os.environ.get("S3_REGION", "us-east-1"),
             url_firmada_segundos=int(os.environ.get("URL_FIRMADA_SEGUNDOS", "900")),
             umbral_reconocido=float(os.environ.get("UMBRAL_RECONOCIDO", "0.70")),
