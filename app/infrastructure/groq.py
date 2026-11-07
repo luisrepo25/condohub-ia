@@ -6,6 +6,7 @@ La clave viene de GROQ_API_KEY.
 import httpx
 
 from app.application.reportes import ConstructorNoDisponible
+from app.infrastructure.claves_groq import CODIGOS_DE_CLAVE_AGOTADA, ClavesGroq
 from app.infrastructure.gemini import INSTRUCCION_DEL_SISTEMA, limpiar_respuesta
 
 
@@ -18,13 +19,13 @@ class ConstructorConsultaGroq:
         cliente: httpx.Client | None = None,
         tiempo_s: float = 60.0,
     ) -> None:
-        self._api_key = api_key
+        self._claves = ClavesGroq(api_key)  # una clave, o varias separadas por comas
         self._modelo = modelo
         self._url_base = url_base.rstrip("/")
         self._cliente = cliente or httpx.Client(timeout=tiempo_s)
 
     def construir(self, instruccion: str, esquema: str) -> str:
-        if not self._api_key:
+        if not self._claves:
             raise ConstructorNoDisponible("El LLM no está configurado (falta GROQ_API_KEY)")
         cuerpo = {
             "model": self._modelo,
@@ -34,14 +35,18 @@ class ConstructorConsultaGroq:
                 {"role": "user", "content": instruccion},
             ],
         }
-        try:
-            r = self._cliente.post(
-                f"{self._url_base}/v1/chat/completions",
-                json=cuerpo,
-                headers={"Authorization": f"Bearer {self._api_key}"},
-            )
-        except httpx.HTTPError as e:
-            raise ConstructorNoDisponible("No se pudo conectar con el LLM") from e
+        for rotadas in range(len(self._claves)):
+            try:
+                r = self._cliente.post(
+                    f"{self._url_base}/v1/chat/completions",
+                    json=cuerpo,
+                    headers={"Authorization": f"Bearer {self._claves.actual()}"},
+                )
+            except httpx.HTTPError as e:
+                raise ConstructorNoDisponible("No se pudo conectar con el LLM") from e
+            if r.status_code not in CODIGOS_DE_CLAVE_AGOTADA or rotadas == len(self._claves) - 1:
+                break
+            self._claves.rotar()  # límite agotado o clave rechazada: se prueba la siguiente
         if r.status_code != 200:
             raise ConstructorNoDisponible(f"El LLM respondió HTTP {r.status_code}")
         try:
