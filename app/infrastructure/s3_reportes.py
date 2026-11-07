@@ -8,15 +8,18 @@ from app.infrastructure.s3_firmador import FirmadorS3
 
 
 class AlmacenReportesS3:
-    def __init__(self, cliente: ClienteS3, firmador: FirmadorS3, bucket: str, reloj: Reloj) -> None:
+    def __init__(
+        self, cliente: ClienteS3, firmador: FirmadorS3, bucket: str, reloj: Reloj, prefijo: str = ""
+    ) -> None:
         self._cliente, self._firmador, self._bucket, self._reloj = cliente, firmador, bucket, reloj
+        self._prefijo = prefijo   # «carpeta» dentro del bucket, p. ej. «reportes/»; vacío = en la raíz
         self._bucket_listo = False
 
     def guardar(self, clave: str, datos: bytes, tipo: str) -> None:
         if not self._bucket_listo:
             self._cliente.crear_bucket(self._bucket)
             self._bucket_listo = True
-        self._cliente.subir(self._bucket, clave, datos, tipo)
+        self._cliente.subir(self._bucket, self._prefijo + clave, datos, tipo)
 
     def firmar_descarga(self, clave: str, vigencia: timedelta) -> str:
-        return self._firmador.firmar_descarga(clave, vigencia, self._reloj.ahora())
+        return self._firmador.firmar_descarga(self._prefijo + clave, vigencia, self._reloj.ahora())

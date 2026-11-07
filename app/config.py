@@ -67,6 +67,7 @@ class Config:
     whisper_calculo: str = "int8"
     almacen_reportes: str = "memoria"   # "memoria" o "s3"
     s3_bucket_reportes: str = "reportes"
+    s3_prefijo_reportes: str = ""   # carpeta dentro del bucket, p. ej. «reportes/»; vacío = en la raíz
 
     @property
     def almacen_rostros(self) -> tuple[str, str, str]:
@@ -138,4 +139,5 @@ class Config:
             whisper_calculo=os.environ.get("WHISPER_CALCULO", "int8"),
             almacen_reportes=os.environ.get("ALMACEN_REPORTES", "memoria"),
             s3_bucket_reportes=os.environ.get("S3_BUCKET_REPORTES", "reportes"),
+            s3_prefijo_reportes=os.environ.get("S3_PREFIJO_REPORTES", ""),
         )

@@ -50,7 +50,8 @@ def _almacen(config: Config, reloj: RelojSistema) -> AlmacenReportes:
             config.s3_secreto,
             config.s3_region,
         )
-        return AlmacenReportesS3(cliente, firmador, config.s3_bucket_reportes, reloj)
+        bucket, prefijo = config.s3_bucket_reportes, config.s3_prefijo_reportes
+        return AlmacenReportesS3(cliente, firmador, bucket, reloj, prefijo)
     raise ValueError(f"ALMACEN_REPORTES desconocido: {config.almacen_reportes!r} (use «memoria» o «s3»)")
 
 
