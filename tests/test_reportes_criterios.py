@@ -333,3 +333,14 @@ def test_G4_si_el_llm_menciona_la_especificacion_pero_la_escribe_mal_se_rechaza_
         leer_especificacion(consulta)
 
     assert e.value.codigo == "G4"
+
+
+def test_G4_el_prompt_aclara_que_agrupar_y_filtrar_nunca_son_motivo_de_sin_datos() -> None:
+    """La prueba en producción (08/11) mostró al LLM respondiendo SIN_DATOS a «promedio por bloque»."""
+    from app.infrastructure.gemini import INSTRUCCION_DEL_SISTEMA
+
+    texto = " ".join(INSTRUCCION_DEL_SISTEMA.split())
+
+    assert "nunca son motivo de SIN_DATOS" in texto
+    assert "SOLO si faltan los DATOS" in texto
+    assert "TODO campo usado en filtros" in texto
