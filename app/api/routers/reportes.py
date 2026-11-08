@@ -74,7 +74,7 @@ def crear_reporte_por_voz(
     casos: Annotated[CasosReportes, Depends(casos_reportes)],
     audio: Annotated[UploadFile | None, File()] = None,
     instruccion: Annotated[str | None, Form()] = None,
-    formato: Annotated[Literal["EXCEL", "PDF"] | None, Form()] = None,
+    formato: Annotated[Literal["EXCEL", "PDF", "WORD"] | None, Form()] = None,
 ) -> ReporteApi:
     """Audio (o instrucción escrita) → consulta GraphQL de solo lectura → Excel/PDF (G4). Solo ADMIN.
 

@@ -10,16 +10,17 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from app.application.modelos import Reloj
+from app.domain.criterios import leer_especificacion, normalizar_consulta
 from app.domain.errores import ReglaViolada
 from app.domain.reportes import (
     Fila,
     FormatoReporte,
     Reporte,
     exigir_solo_lectura,
-    filas_desde_respuesta,
     vista_previa_desde,
 )
 from app.domain.roles import Solicitante
+from app.domain.tablas import aplicar_especificacion, tablas_desde_respuesta
 
 
 class AudioInvalido(Exception):
@@ -139,9 +140,11 @@ class IniciarReporte:
         )
         reporte.registrar_instruccion(instruccion, formato_elegido)
         try:
-            consulta = self._constructor.construir(instruccion, self._gestion.esquema(token))
+            esquema = self._gestion.esquema(token)
+            consulta = normalizar_consulta(self._constructor.construir(instruccion, esquema))
             reporte.registrar_consulta(consulta)
             exigir_solo_lectura(self._analizador.operaciones(consulta))
+            leer_especificacion(consulta)  # G4: criterios mal formados se rechazan ya, no se ignoran
         except (ReglaViolada, ConsultaInvalida) as e:
             reporte.fallar(e.mensaje if isinstance(e, ReglaViolada) else str(e), self._reloj.ahora())
             self._repositorio.guardar(reporte)
@@ -175,8 +178,14 @@ class GenerarArchivoReporte:
             datos = self._gestion.ejecutar(reporte.consulta_graphql, token)
             generador = self._generadores[reporte.formato]
             titulo = reporte.transcripcion or "Reporte"
-            filas = filas_desde_respuesta(datos)
-            archivo = generador.generar(titulo, filas)
+            especificacion = leer_especificacion(reporte.consulta_graphql)
+            tablas = aplicar_especificacion(tablas_desde_respuesta(datos), especificacion)
+            filas = tablas[0].filas
+            por_tablas = getattr(generador, "generar_tablas", None)  # Excel, PDF y Word: una tabla por lista
+            if len(tablas) > 1 and por_tablas is not None:
+                archivo = por_tablas(titulo, tablas)
+            else:
+                archivo = generador.generar(titulo, filas)
             clave = f"{reporte.id}.{generador.extension}"
             self._almacen.guardar(clave, archivo, generador.tipo)
             reporte.registrar_vista_previa(vista_previa_desde(filas))

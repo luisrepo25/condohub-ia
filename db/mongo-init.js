@@ -185,7 +185,7 @@ asegurar('reportes', {
       pattern: '^\\s*(query\\b|\\{)',
       description: 'G4: solo lectura; nunca mutation',
     },
-    formato: { enum: ['EXCEL', 'PDF'] },
+    formato: { enum: ['EXCEL', 'PDF', 'WORD'] },
     archivoKey: { bsonType: 'string' },
     estado: { enum: ['PROCESANDO', 'LISTO', 'FALLIDO'], description: 'mismos valores que ia.yaml' },
     motivoFallo: { bsonType: 'string' },

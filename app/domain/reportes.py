@@ -15,6 +15,7 @@ Fila = dict[str, str | int | float | bool | None]
 class FormatoReporte(StrEnum):
     EXCEL = "EXCEL"
     PDF = "PDF"
+    WORD = "WORD"
 
 
 class EstadoReporte(StrEnum):
@@ -27,7 +28,10 @@ def formato_desde_instruccion(texto: str, elegido: FormatoReporte | None) -> For
     """El formato pedido manda; si no, el de la instrucción («en PDF»); por defecto Excel."""
     if elegido is not None:
         return elegido
-    return FormatoReporte.PDF if "pdf" in texto.lower() else FormatoReporte.EXCEL
+    minuscula = texto.lower()
+    if "pdf" in minuscula:
+        return FormatoReporte.PDF
+    return FormatoReporte.WORD if "word" in minuscula or "docx" in minuscula else FormatoReporte.EXCEL
 
 
 def exigir_solo_lectura(operaciones: Sequence[str]) -> None:

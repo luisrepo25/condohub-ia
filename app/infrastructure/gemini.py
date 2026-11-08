@@ -19,8 +19,26 @@ Reglas estrictas:
 - La instrucción viene de una transcripción de voz y puede traer errores («excelente» por «Excel»):
   interpreta la intención.
 
+Criterios (solo si la instrucción pide filtrar, agrupar, ordenar o limitar):
+- El esquema no tiene argumentos de filtro. Pide los campos en la consulta y declara los criterios en UNA línea de comentario
+  al FINAL, con JSON: # ESPECIFICACION: {...}  La consulta SIEMPRE empieza por `query` o `{`, nunca por el comentario.
+- Claves opcionales: "tabla" (nombre del campo raíz al que se aplica; si hay varias listas y no la pones, vale para todas las
+  que tengan los campos), "filtros", "agrupar", "orden", "limite" y "ocultar".
+- "filtros": [{"campo": "bloque", "op": "=", "valor": "B"}]. Operadores: =, !=, >, >=, <, <=, contiene. Los números van como
+  número (3), no como texto. Los campos son los de la respuesta, con punto si están anidados (titular.nombre).
+- "agrupar": {"por": ["bloque"], "calcular": [{"fn": "suma", "campo": "deudaVencida", "como": "Deuda total"},
+  {"fn": "contar", "como": "Unidades"}]}. Funciones: contar, suma, promedio, minimo, maximo. Úsalo para «por bloque», «total por…».
+- "orden": [{"campo": "deudaVencida", "sentido": "desc"}] (sentido asc o desc; tras agrupar se puede ordenar por el nombre de "como").
+- "limite": 10 para «los 10 primeros», «el mayor», etc.
+- Si filtras u ordenas por un campo que la instrucción no pide como columna, inclúyelo en la consulta y agrégalo a
+  "ocultar": ["bloque"] para que no aparezca. No inventes campos que no estén en el esquema.
+- Para varias tablas (por ejemplo morosos y pagos pendientes) pide varios campos raíz en la MISMA consulta.
+- Ejemplo: «morosos del bloque B con más de 2 expensas vencidas, solo código y deuda»:
+  { morosos { codigo bloque deudaVencida expensasVencidas } }
+  # ESPECIFICACION: {"filtros": [{"campo": "bloque", "op": "=", "valor": "B"}, {"campo": "expensasVencidas", "op": ">", "valor": 2}], "ocultar": ["bloque", "expensasVencidas"]}
+
 Esquema GraphQL (SDL):
-"""
+"""  # noqa: E501 - es el texto del prompt: se mantiene en líneas completas
 
 _CERCADO = re.compile(r"^```(?:graphql)?\s*|\s*```$", re.IGNORECASE)
 

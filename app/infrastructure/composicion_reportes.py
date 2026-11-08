@@ -22,7 +22,8 @@ from app.infrastructure.graphql_analizador import AnalizadorGraphqlCore
 from app.infrastructure.groq import ConstructorConsultaGroq
 from app.infrastructure.memoria_reportes import AlmacenReportesMemoria, RepositorioReportesMemoria
 from app.infrastructure.mongo.reportes import RepositorioReportesMongo
-from app.infrastructure.reportes_archivos import GeneradorExcel, GeneradorPdf
+from app.infrastructure.reporte_word import GeneradorWord
+from app.infrastructure.reportes_por_tablas import ExcelPorTablas, PdfPorTablas
 from app.infrastructure.s3_cliente import ClienteS3
 from app.infrastructure.s3_firmador import FirmadorS3
 from app.infrastructure.s3_reportes import AlmacenReportesS3
@@ -86,7 +87,11 @@ def construir_casos_reportes(config: Config) -> CasosReportes:
         generar=GenerarArchivoReporte(
             repositorio,
             gestion,
-            {FormatoReporte.EXCEL: GeneradorExcel(), FormatoReporte.PDF: GeneradorPdf()},
+            {
+                FormatoReporte.EXCEL: ExcelPorTablas(),
+                FormatoReporte.PDF: PdfPorTablas(),
+                FormatoReporte.WORD: GeneradorWord(),
+            },
             almacen,
             reloj,
         ),
