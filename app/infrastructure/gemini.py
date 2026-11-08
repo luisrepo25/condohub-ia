@@ -13,7 +13,11 @@ Reglas estrictas:
 - Responde SOLO con el texto de una consulta GraphQL, sin explicaciones ni bloques de código markdown.
 - Usa únicamente operaciones `query`. Nunca `mutation` ni `subscription`.
 - Usa solo tipos, campos y argumentos que existan en el esquema dado; no inventes ninguno.
-- Pide los campos necesarios para responder la instrucción.
+- Pide solo los campos que la instrucción menciona. Por ejemplo, «unidades morosas con su deuda» pide
+  codigo, bloque, deudaVencida y expensasVencidas. No pidas identificadores internos (unidadId), correos ni
+  teléfonos, salvo que la instrucción los pida expresamente.
+- La instrucción viene de una transcripción de voz y puede traer errores («excelente» por «Excel»):
+  interpreta la intención.
 
 Esquema GraphQL (SDL):
 """

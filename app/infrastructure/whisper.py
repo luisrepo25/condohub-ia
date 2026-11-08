@@ -5,6 +5,12 @@ from typing import Any
 
 from app.application.reportes import AudioInvalido, TranscripcionNoDisponible
 
+# Vocabulario del dominio: sin él Whisper oye «excelente» por «Excel» y pierde verbos como «genera».
+AYUDA_DE_VOCABULARIO = (
+    "Genera un reporte de unidades morosas con su deuda, expensas, pagos pendientes, recargos y reservas, "
+    "por bloque, en Excel o PDF."
+)
+
 
 class TranscriptorWhisper:
     def __init__(
@@ -30,7 +36,13 @@ class TranscriptorWhisper:
     def transcribir(self, audio: bytes) -> str:
         modelo = self._modelo_cargado()
         try:
-            segmentos, _ = modelo.transcribe(io.BytesIO(audio), language=self._idioma, vad_filter=True)
+            segmentos, _ = modelo.transcribe(
+                io.BytesIO(audio),
+                language=self._idioma,
+                vad_filter=True,
+                initial_prompt=AYUDA_DE_VOCABULARIO,
+                beam_size=5,
+            )
             texto = " ".join(s.text.strip() for s in segmentos).strip()
         except Exception as e:  # noqa: BLE001 - PyAV lanza varios tipos según el formato dañado
             raise AudioInvalido("No se pudo leer el audio (use WAV, MP3 o WebM)") from e
