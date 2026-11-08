@@ -344,3 +344,14 @@ def test_G4_el_prompt_aclara_que_agrupar_y_filtrar_nunca_son_motivo_de_sin_datos
     assert "nunca son motivo de SIN_DATOS" in texto
     assert "SOLO si faltan los DATOS" in texto
     assert "TODO campo usado en filtros" in texto
+
+
+def test_G4_el_prompt_fija_que_tres_o_mas_es_mayor_o_igual_y_mas_de_tres_es_mayor() -> None:
+    """Producción (08/11): «tres o más» salió como «> 3», que dejó el reporte vacío."""
+    from app.infrastructure.gemini import INSTRUCCION_DEL_SISTEMA
+
+    texto = " ".join(INSTRUCCION_DEL_SISTEMA.split())
+
+    assert "«N o más», «al menos N»" in texto and '">=" N' in texto
+    assert "«más de N»" in texto and '">" N' in texto
+    assert "«tres o más expensas vencidas»" in texto

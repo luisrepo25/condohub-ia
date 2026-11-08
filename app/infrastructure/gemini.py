@@ -26,6 +26,12 @@ Criterios (solo si la instrucción pide filtrar, agrupar, ordenar o limitar):
   que tengan los campos), "filtros", "agrupar", "orden", "limite" y "ocultar".
 - "filtros": [{"campo": "bloque", "op": "=", "valor": "B"}]. Operadores: =, !=, >, >=, <, <=, contiene. Los números van como
   número (3), no como texto. Los campos son los de la respuesta, con punto si están anidados (titular.nombre).
+- Equivalencias OBLIGATORIAS de los operadores (el número lo incluye o no según la frase):
+  «N o más», «al menos N», «mínimo N», «desde N» → ">=" N · «más de N», «mayor que N», «superior a N» → ">" N ·
+  «N o menos», «como máximo N», «hasta N» → "<=" N · «menos de N», «menor que N», «inferior a N» → "<" N ·
+  «igual a», «es», «de» → "=" · «distinto de», «excepto» → "!=" · «que contenga», «con la palabra» → "contiene".
+  Los números dichos con letras («tres», «cinco») van como número (3, 5). Ejemplo: «tres o más expensas vencidas» →
+  {"campo": "expensasVencidas", "op": ">=", "valor": 3}.
 - "agrupar": {"por": ["bloque"], "calcular": [{"fn": "suma", "campo": "deudaVencida", "como": "Deuda total"},
   {"fn": "contar", "como": "Unidades"}]}. Funciones: contar, suma, promedio, minimo, maximo. Úsalo para «por bloque», «total por…».
 - "orden": [{"campo": "deudaVencida", "sentido": "desc"}] (sentido asc o desc; tras agrupar se puede ordenar por el nombre de "como").
