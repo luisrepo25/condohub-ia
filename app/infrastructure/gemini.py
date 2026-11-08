@@ -33,6 +33,8 @@ Criterios (solo si la instrucción pide filtrar, agrupar, ordenar o limitar):
 - Si filtras u ordenas por un campo que la instrucción no pide como columna, inclúyelo en la consulta y agrégalo a
   "ocultar": ["bloque"] para que no aparezca. No inventes campos que no estén en el esquema.
 - Para varias tablas (por ejemplo morosos y pagos pendientes) pide varios campos raíz en la MISMA consulta.
+- Si lo pedido no se puede obtener con el esquema (reservas, accesos, visitas, proveedores…), NO inventes campos ni
+  devuelvas una consulta vacía: responde SOLO una línea `# SIN_DATOS: motivo breve en español`.
 - Ejemplo: «morosos del bloque B con más de 2 expensas vencidas, solo código y deuda»:
   { morosos { codigo bloque deudaVencida expensasVencidas } }
   # ESPECIFICACION: {"filtros": [{"campo": "bloque", "op": "=", "valor": "B"}, {"campo": "expensasVencidas", "op": ">", "valor": 2}], "ocultar": ["bloque", "expensasVencidas"]}

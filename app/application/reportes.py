@@ -10,7 +10,7 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from app.application.modelos import Reloj
-from app.domain.criterios import leer_especificacion, normalizar_consulta
+from app.domain.criterios import leer_especificacion, motivo_sin_datos, normalizar_consulta
 from app.domain.errores import ReglaViolada
 from app.domain.reportes import (
     Fila,
@@ -142,6 +142,10 @@ class IniciarReporte:
         try:
             esquema = self._gestion.esquema(token)
             consulta = normalizar_consulta(self._constructor.construir(instruccion, esquema))
+            sin_datos = motivo_sin_datos(consulta)
+            if sin_datos is not None:  # el LLM avisó que Gestión no expone eso: se dice, no se inventa
+                mensaje = f"Esa información no se puede sacar de los datos de Gestión: {sin_datos[:200]}"
+                raise ReglaViolada("G4", mensaje)
             reporte.registrar_consulta(consulta)
             exigir_solo_lectura(self._analizador.operaciones(consulta))
             leer_especificacion(consulta)  # G4: criterios mal formados se rechazan ya, no se ignoran

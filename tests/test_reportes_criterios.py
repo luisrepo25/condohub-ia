@@ -291,3 +291,45 @@ def test_G4_con_tabla_explicita_el_criterio_solo_toca_esa_y_exige_el_campo() -> 
         _aplicar(
             '{"tabla": "pagosPendientes", "filtros": [{"campo": "bloque", "op": "=", "valor": "B"}]}', tablas
         )
+
+
+# ------------------------------------------------------------------ fallos reales del LLM (producción, 08/11)
+
+
+def test_G4_el_comentario_en_la_misma_linea_que_la_consulta_tambien_se_lee() -> None:
+    """Groq escribió la consulta y el comentario en una sola línea y el «5 primeros» se ignoró en silencio."""
+    consulta = (
+        "{ morosos { codigo deudaVencida } } # ESPECIFICACION: "
+        '{"orden": [{"campo": "deudaVencida", "sentido": "desc"}], "limite": 2}'
+    )
+
+    especificacion = leer_especificacion(consulta)
+    (tabla,) = aplicar_especificacion([Tabla("morosos", [dict(f) for f in MOROSOS])], especificacion)
+
+    assert especificacion.limite == 2
+    assert _codigos(tabla) == ["B-102", "C-101"]
+    normal = normalizar_consulta(consulta)
+    assert normal.startswith("{ morosos { codigo deudaVencida } }")
+    assert normal.splitlines()[-1].startswith("# ESPECIFICACION:")
+    assert leer_especificacion(normal).limite == 2
+
+
+def test_G4_con_tilde_o_en_minuscula_el_comentario_tambien_se_lee() -> None:
+    assert leer_especificacion('{ x }\n# Especificación: {"limite": 3}').limite == 3
+
+
+@pytest.mark.parametrize(
+    "consulta",
+    [
+        '{ x }\n# ESPECIFICACION {"limite": 3}',  # sin los dos puntos
+        "{ x }\n# ESPECIFICACION:",  # sin contenido
+        '{ x }\n# CRITERIOS: {"limite": 3}\n# especificacion de criterios',  # la menciona pero no la declara
+    ],
+)
+def test_G4_si_el_llm_menciona_la_especificacion_pero_la_escribe_mal_se_rechaza_no_se_ignora(
+    consulta: str,
+) -> None:
+    with pytest.raises(ReglaViolada) as e:
+        leer_especificacion(consulta)
+
+    assert e.value.codigo == "G4"

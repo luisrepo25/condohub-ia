@@ -21,7 +21,10 @@ MARCA = "ESPECIFICACION:"
 MAX_CARACTERES = 4000
 MAX_CRITERIOS = 20
 MAX_LIMITE = 10_000
-_LINEA = re.compile(r"^[ \t]*#[ \t]*" + MARCA + r"[ \t]*(.*)$", re.MULTILINE)
+# El comentario va en su línea o al final de la consulta (`{ ... } # ESPECIFICACION: ...`); con o sin tilde.
+_LINEA = re.compile(r"#[ \t]*ESPECIFICACI[OÓ]N[ \t]*:[ \t]*(.*)$", re.MULTILINE | re.IGNORECASE)
+_MENCIONADA = re.compile(r"ESPECIFICACI[OÓ]N", re.IGNORECASE)
+_SIN_DATOS = re.compile(r"^[ 	]*#[ 	]*SIN_DATOS[ 	]*:?[ 	]*(.*)$", re.MULTILINE | re.IGNORECASE)
 _CAMPO = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]{0,79}$")
 _ALIAS = re.compile(r"^[A-Za-z_][A-Za-z0-9_ ]{0,39}$")
 _CLAVES = frozenset({"tabla", "filtros", "agrupar", "orden", "limite", "ocultar"})
@@ -72,6 +75,12 @@ class Especificacion:
     @property
     def vacia(self) -> bool:
         return not (self.filtros or self.agrupacion or self.orden or self.limite or self.ocultar)
+
+
+def motivo_sin_datos(consulta: str) -> str | None:
+    """Si el LLM avisa que lo pedido no está en el esquema (`# SIN_DATOS: motivo`), el motivo; si no, None."""
+    encontrado = _SIN_DATOS.search(consulta)
+    return None if encontrado is None else (encontrado.group(1).strip() or "no está en el esquema")
 
 
 def normalizar_consulta(consulta: str) -> str:
@@ -167,6 +176,10 @@ def leer_especificacion(consulta: str) -> Especificacion:
     """Especificación de la consulta (vacía sin línea `# ESPECIFICACION:`). Lanza `ReglaViolada` (G4)."""
     encontradas = _LINEA.findall(consulta)
     if not encontradas:
+        if _MENCIONADA.search(
+            consulta
+        ):  # el LLM quiso declarar criterios pero no con el formato: no se ignoran
+            raise _error("la línea de criterios debe ser «# ESPECIFICACION: {…}» en una sola línea")
         return Especificacion()
     if len(encontradas) > 1:
         raise _error("hay más de una línea ESPECIFICACION")
@@ -208,14 +221,16 @@ def _numero(valor: Any) -> Decimal | None:
 
 
 def _comparar(izquierda: Any, operador: str, derecha: Any) -> bool:
-    return bool({
-        "=": izquierda == derecha,
-        "!=": izquierda != derecha,
-        ">": izquierda > derecha,
-        ">=": izquierda >= derecha,
-        "<": izquierda < derecha,
-        "<=": izquierda <= derecha,
-    }[operador])
+    return bool(
+        {
+            "=": izquierda == derecha,
+            "!=": izquierda != derecha,
+            ">": izquierda > derecha,
+            ">=": izquierda >= derecha,
+            "<": izquierda < derecha,
+            "<=": izquierda <= derecha,
+        }[operador]
+    )
 
 
 def _coincide(dato: Any, operador: str, esperado: Any) -> bool:

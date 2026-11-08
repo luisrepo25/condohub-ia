@@ -355,3 +355,35 @@ def test_G4_api_responde_422_con_code_G4_si_los_criterios_estan_mal_formados(
     )
 
     assert r.status_code == 422 and r.json()["code"] == "G4"
+
+
+# ------------------------------------------------ lo que Gestión no expone (producción, 08/11)
+
+
+def test_G4_si_el_llm_avisa_que_no_hay_datos_se_rechaza_con_un_motivo_claro_y_nada_se_ejecuta() -> None:
+    mundo = Mundo("# SIN_DATOS: las reservas no están en el esquema de Gestión")
+
+    with pytest.raises(ReglaViolada) as e:
+        mundo.casos.iniciar.iniciar(ADMIN, b"audio", "tok", None)
+
+    assert e.value.codigo == "G4"
+    assert "reservas no están" in e.value.mensaje
+    assert mundo.gestion.ejecutadas == []
+    (rastro,) = mundo.repositorio._reportes.values()  # type: ignore[attr-defined]
+    assert rastro.estado is EstadoReporte.FALLIDO and rastro.consulta_graphql is None
+
+
+def test_G4_api_responde_422_con_code_G4_cuando_lo_pedido_no_esta_en_los_datos(
+    crear_token: CrearToken,
+) -> None:
+    mundo = Mundo("# SIN_DATOS: los accesos viven en otro servicio")
+    verificador = JwtVerificador(ISSUER, lambda _t: _clave.public_key())
+    api = TestClient(create_app(verificador, casos_reportes=mundo.casos))
+
+    r = api.post(
+        "/reportes/voz",
+        headers={"Authorization": f"Bearer {crear_token('ADMIN')}"},
+        data={"instruccion": "accesos de hoy"},
+    )
+
+    assert r.status_code == 422 and r.json()["code"] == "G4"
